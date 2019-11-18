@@ -19,7 +19,7 @@ public:
   int systemMaxTime;
 
 
-virtual void executeSytemFunction()
+virtual void executeSystemFunction()
 {
 }
 

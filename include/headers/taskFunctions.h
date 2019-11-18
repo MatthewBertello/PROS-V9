@@ -6,5 +6,6 @@
 void autonomousInUserControlFn(void *param);
 void runRobotFunctionTaskFn(void *param);
 void slewMotors(void *param);
+void mainDrivePositionTrackerFn(void *param);
 
 #endif

@@ -332,7 +332,7 @@ public:
 		{
 			if (allSystems[i] != nullptr)
 			{
-				allSystems[i]->executeSytemFunction();
+				allSystems[i]->executeSystemFunction();
 			}
 		}
 

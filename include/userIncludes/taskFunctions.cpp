@@ -24,7 +24,7 @@ void runRobotFunctionTaskFn(void *param)
     while (pros::competition::is_autonomous || runningRunRobotFunctionTask)
     {
       autonRobotFunction.exectueRobotFunction();
-      pros::delay(5);
+      pros::delay(1);
     }
 
     while (!pros::competition::is_autonomous && !runningRunRobotFunctionTask)
@@ -73,6 +73,18 @@ void slewMotors(void *param)
     motorIndex = 0;
     pros::c::task_delay_until(&lastRun, SLEW_REFRESH_RATE);
     lastRun = pros::c::millis();
+  }
+}
+
+void mainDrivePositionTrackerFn(void *param)
+{
+  uint32_t lastRun = pros::c::millis();
+  while (true)
+  {
+    lastRun = pros::c::millis();
+    mainDrivePositionTracker.trackPosition();
+    mainDrivePositionTracker.trackVelocity();
+    pros::c::task_delay_until(&lastRun, 1);
   }
 }
 #endif
