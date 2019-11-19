@@ -10,4 +10,6 @@ extern bool autonomousSelected;
 extern int autonomousMode;
 extern bool runningRunRobotFunctionTask;
 
+void autonomous();
+
 #endif

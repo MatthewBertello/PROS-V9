@@ -4,4 +4,6 @@
 
 int sgn(float a);
 
+extern const long double PI;
+
 #endif

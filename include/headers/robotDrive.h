@@ -25,29 +25,10 @@ public:
 
   enum driveCommands
   {
-    pid,
-    sweepRight,
-    sweepLeft,
-    forwardRight,
-    forwardLeft,
-    driveStraight,
-    gyroDriveStraight,
-    gyroTurn,
-
-    PIDDriveCommandMaxValue,
-
-    speed,
-    driveSpeed,
-    turnSpeed,
-    sweepRightSpeed,
-    sweepLeftSpeed,
-    forwardRightSpeed,
-    forwardLeftSpeed,
-    driveStraightSpeed,
-    gyroDriveStraightSpeed,
-    gyroTurnSpeed,
-
-    driveCommandMaxValue,
+    driveTo,
+    driveThrough,
+    turnToPoint,
+    turnToAngle
   };
 
   driveLayouts driveType = STRAIGHT_DRIVE;
@@ -56,31 +37,32 @@ public:
   driveMotor *rightMotors[TOTAL_MOTORS] = {};
   driveMotor *strafeMotors[TOTAL_MOTORS] = {};
 
-  bool hasGyro = false;
-  bool hasEncoders = false;
-
   pros::ADIGyro *driveGyro = nullptr;
   pros::ADIEncoder *leftEncoder = nullptr;
   pros::ADIEncoder *rightEncoder = nullptr;
   pros::ADIEncoder *strafeEncoder = nullptr;
 
-  PIDController leftDrivePID = PIDController(.1, .05, .01, 5, 254, 0, 635, true, true);
-  PIDController rightDrivePID = PIDController(.1, .05, .01, 5, 254, 0, 635, true, true);
-  PIDController drivePID = PIDController(.1, 0, 0, 10, 0, 0, 0, true, true);
-  PIDController gyroPID = PIDController(.1, .025, .1, 10, 800, 0, 300, true, true);
-  PIDController straightGyroPID = PIDController(.0025, .00, .0, 0, 1000, 0, 500, true, true);
+  PIDController distancePID = PIDController(.1, .05, .01, 5, 254, 0, 635, true, true);
+  PIDController turnPID = PIDController(.1, .025, .1, 10, 800, 0, 300, true, true);
+  PIDController driveTurnPID = PIDController(.0025, .00, .0, 0, 1000, 0, 500, true, true);
 
   timer drivePIDTimer;
+
+  bool useGyroInsteadOfFreeEncoders = false;
 
   float leftSpeed = 0;  // left drive speed
   float rightSpeed = 0; // right drive speed
   float strafeSpeed = 0;
-  int chassisDirection = 0;
-  int strafeDirection = 0;
-  float chassisSpeed = 0;
-  float chassisDistance = 0;
-  float strafeDistance = 0;
-  int largestDriveInput = 127;
+  int driveCommand = -1;
+
+  float targetX = 0;
+  float targetY = 0;
+  float targetAngle = 0;
+
+  float deltaX = 0;
+  float deltaY = 0;
+  float direction = 0;
+  float distance = 0;
 
   float leftDriveSensorLastReset = 0;
   float rightDriveSensorLastReset = 0;
@@ -98,43 +80,143 @@ public:
   float rightTicksPerRotation = 360.0;
   float strafeTicksPerRotation = 360.0;
 
-  int driveThreshold = 25;
-  int gyroThreshold = 50;
+  int distanceThreshold = 25;
+  int angleThreshold = 50;
 
   float heading = 0;
+
+  int addSystemCommands(int readPosition, std::vector<int> &commands)
+  {
+    int numberOfCommands = 0;
+    switch (commands[readPosition])
+    {
+    case driveTo:
+
+      numberOfCommands = 3;
+      break;
+
+    case driveThrough:
+      numberOfCommands = 3;
+      break;
+
+    case turnToPoint:
+      numberOfCommands = 3;
+      break;
+
+    case turnToAngle:
+      numberOfCommands = 2;
+      break;
+
+    default:
+
+      break;
+    }
+    for (int i = 0; i < numberOfCommands; i++)
+    {
+      systemCommands.push_back(commands[readPosition]);
+      readPosition++;
+    }
+    return readPosition;
+  }
+
+  bool updateSystem()
+  {
+    if (systemDone)
+    {
+      systemTimer.zeroTimer();
+      drivePIDTimer.stopTimer();
+      drivePIDTimer.zeroTimer();
+
+      driveTurnPID.resetPID();
+      distancePID.resetPID();
+      turnPID.resetPID();
+
+      driveTurnPID.setPIDTarget(0);
+      distancePID.setPIDTarget(0);
+      turnPID.setPIDTarget(0);
+
+      systemMaxTime = 0;
+      systemDone = false;
+
+      switch (systemCommands[systemReadPos])
+      {
+      case driveTo:
+        systemReadPos++;
+        targetX = systemCommands[systemReadPos];
+        systemReadPos++;
+        targetY = systemCommands[systemReadPos];
+        systemReadPos++;
+        break;
+
+      case driveThrough:
+        systemReadPos++;
+        targetX = systemCommands[systemReadPos];
+        systemReadPos++;
+        targetY = systemCommands[systemReadPos];
+        systemReadPos++;
+        break;
+
+      case turnToPoint:
+        systemReadPos++;
+        targetX = systemCommands[systemReadPos];
+        systemReadPos++;
+        targetY = systemCommands[systemReadPos];
+        systemReadPos++;
+        break;
+
+      case turnToAngle:
+        systemReadPos++;
+        targetAngle = systemCommands[systemReadPos];
+        systemReadPos++;
+        break;
+
+      default:
+        systemReadPos++;
+        break;
+      }
+    }
+    executeSystemFunction();
+    if (systemReadPos >= systemCommands.size())
+    {
+      systemCompleted = true;
+    }
+    return systemCompleted;
+  }
 
   void setDriveType(driveLayouts driveType)
   {
     this->driveType = driveType;
   }
-
   void addGyro(pros::ADIGyro *gyro)
   {
     this->driveGyro = gyro;
-    hasGyro = true;
   }
-
   void addLeftEncoder(pros::ADIEncoder *encoder)
   {
     this->leftEncoder = encoder;
+    resetLeftDriveSensor();
   }
   void addRightEncoder(pros::ADIEncoder *encoder)
   {
     this->rightEncoder = encoder;
+    resetRightDriveSensor();
   }
   void addStrafeEncoder(pros::ADIEncoder *encoder)
   {
     this->strafeEncoder = encoder;
+    resetStrafeDriveSensor();
   }
-
-  float getGyroSensor()
+  float getCurrentAngle()
   {
-    if (hasGyro)
+    if ((leftEncoder != nullptr && rightEncoder != nullptr) && !useGyroInsteadOfFreeEncoders)
+      return getAngleAsGyro();
+    else if (driveGyro != nullptr)
       return this->driveGyro->get_value();
+    else if (leftMotors[0] != nullptr && rightMotors[0] != nullptr)
+      return getAngleAsGyro();
     else
       return 0;
   }
-
   bool addLeftMotor(driveMotor *newMotor)
   {
     for (int i = 0; i < 7; i++)
@@ -147,7 +229,6 @@ public:
     }
     return false;
   }
-
   bool addRightMotor(driveMotor *newMotor)
   {
     for (int i = 0; i < 7; i++)
@@ -160,7 +241,6 @@ public:
     }
     return false;
   }
-
   bool addStrafeMotor(driveMotor *newMotor)
   {
     for (int i = 0; i < 7; i++)
@@ -173,7 +253,6 @@ public:
     }
     return false;
   }
-
   void resetLeftDriveSensor()
   {
     leftDriveSensorLastReset = getAbsoluteLeftDriveSensor();
@@ -188,7 +267,6 @@ public:
   {
     strafeDriveSensorLastReset = getAbsoluteStrafeDriveSensor();
   }
-
   float getAbsoluteLeftDriveSensor()
   {
     if (leftEncoder != nullptr)
@@ -203,7 +281,6 @@ public:
         return 0;
     }
   }
-
   float getAbsoluteRightDriveSensor()
   {
     if (rightEncoder != nullptr)
@@ -218,7 +295,6 @@ public:
         return 0;
     }
   }
-
   float getAbsoluteStrafeDriveSensor()
   {
     if (strafeEncoder != nullptr)
@@ -233,7 +309,6 @@ public:
         return 0;
     }
   }
-
   float getLeftDriveSensor()
   {
     if (leftEncoder != nullptr)
@@ -248,7 +323,6 @@ public:
         return 0;
     }
   }
-
   float getRightDriveSensor()
   {
     if (rightEncoder != nullptr)
@@ -263,7 +337,6 @@ public:
         return 0;
     }
   }
-
   float getStrafeDriveSensor()
   {
     if (strafeEncoder != nullptr)
@@ -301,272 +374,195 @@ public:
   {
     if (!this->systemDone) // if the drive is not done
     {
-      if (chassisDirection == driveStraight) // if the robot should drive straight
+      switch (driveCommand)
       {
-        rightDrivePID.setPIDTarget(chassisDistance);
-        leftDrivePID.setPIDTarget(chassisDistance);
-        leftSpeed = leftDrivePID.calculatePID(getLeftDriveSensor());
-        leftSpeed = rightDrivePID.calculatePID(getRightDriveSensor());
+      case driveTo:
 
-        if (fabs(getRightDriveSensor()) > fabs(getLeftDriveSensor())) // if the right drive has travelled farther than the left drive
-        {
-          drivePID.resetPID();
-          drivePID.setPIDTarget(getLeftDriveSensor());
-          rightSpeed = rightSpeed - fabs(drivePID.calculatePID(getRightDriveSensor()));
-        }
-        else if (fabs(getLeftDriveSensor()) > fabs(getRightDriveSensor())) // if the left drive has travelled farther than the left drive
-        {
-          drivePID.resetPID();
-          drivePID.setPIDTarget(getRightDriveSensor());
-          rightSpeed = rightSpeed - fabs(drivePID.calculatePID(getLeftDriveSensor()));
-        }
+        deltaX = targetX - currentX;
+        deltaY = targetY - currentY;
+        direction = atan(deltaY / deltaX);
+        distance = sqrt(pow(deltaX, 2) + pow(deltaY, 2));
 
-        if ((fabs(getRightDriveSensor() - chassisDistance) <= driveThreshold) || (fabs(getLeftDriveSensor() - chassisDistance) <= driveThreshold))
-          drivePIDTimer.startTimer();
+        leftSpeed = rightSpeed = distancePID.calculatePID(distance);
+        leftSpeed += (fabs(leftSpeed) * driveTurnPID.calculatePID(direction - getCurrentAngle()));
+        rightSpeed -= (fabs(rightSpeed) * driveTurnPID.calculatePID(direction - getCurrentAngle()));
 
-        if (drivePIDTimer.currentTime() > 300)
-          this->systemDone = true;
-      }
-
-      else if (chassisDirection == gyroDriveStraight) // otherwise if the robot should drive straight with the gyro
-      {
-        heading = correctGyroValue(heading);
-        straightGyroPID.setPIDTarget(0);
-        rightDrivePID.setPIDTarget(chassisDistance);
-        leftDrivePID.setPIDTarget(chassisDistance);
-        leftSpeed = leftDrivePID.calculatePID(getLeftDriveSensor());
-        rightSpeed = rightDrivePID.calculatePID(getRightDriveSensor());
-        if (getLeftDriveSensor() > getRightDriveSensor())
-          chassisSpeed = getRightDriveSensor();
-        else
-          chassisSpeed = getLeftDriveSensor();
-
-        if (getLeftDriveSensor() > getRightDriveSensor())
-          leftSpeed = rightSpeed;
-        else
-          rightSpeed = leftSpeed;
-
-        if (fabs(leftSpeed) > largestDriveInput)
-          leftSpeed = largestDriveInput * sgn(leftSpeed);
-        if (fabs(rightSpeed) > largestDriveInput)
-          rightSpeed = largestDriveInput * sgn(rightSpeed);
-
-        if ((gyroDirection(getGyroSensor(), heading) == 1)) // if the robot is drifting left
-        {
-          leftSpeed += (fabs(leftSpeed) * fabs(straightGyroPID.calculatePID(gyroDifference(getGyroSensor(), heading))));
-          rightSpeed -= (fabs(rightSpeed) * fabs(straightGyroPID.calculatePID(gyroDifference(getGyroSensor(), heading))));
-          // leftSpeed +=fabs(leftSpeed)*.5;
-          // rightSpeed -=fabs(rightSpeed)*.5;
-          // leftSpeed += fabs(calculatePID(&straightGyroPID, gyroDifference(getGyroSensor(), heading)));
-          // rightSpeed -= fabs(calculatePID(&straightGyroPID, gyroDifference(getGyroSensor(), heading)));
-        }
-        else if ((gyroDirection(getGyroSensor(), heading) == -1)) //otherwise if the robot is drifting right
-        {
-          leftSpeed -= (fabs(leftSpeed) * fabs(straightGyroPID.calculatePID(gyroDifference(getGyroSensor(), heading))));
-          rightSpeed += (fabs(rightSpeed) * fabs(straightGyroPID.calculatePID(gyroDifference(getGyroSensor(), heading))));
-          // leftSpeed -=fabs(leftSpeed)*.5;
-          // rightSpeed +=fabs(rightSpeed)*.5;
-          // leftSpeed -= fabs(calculatePID(&straightGyroPID, gyroDifference(getGyroSensor(), heading)));
-          // rightSpeed += fabs(calculatePID(&straightGyroPID, gyroDifference(getGyroSensor(), heading)));
-        }
-
-        if ((fabs(chassisSpeed - chassisDistance) <= driveThreshold))
+        if (distance <= distanceThreshold)
         {
           drivePIDTimer.startTimer();
         }
         if (drivePIDTimer.currentTime() > 300)
           this->systemDone = true;
-      }
+        break;
 
-      else if (chassisDirection == gyroTurn) // if the robot should turn using the gyro sensor
-      {
-        chassisDistance = correctGyroValue(chassisDistance); // correct the gyro target value
-        gyroPID.setPIDTarget(0);
-        if ((gyroDirection(getGyroSensor(), chassisDistance) == 1))
-        {
-          leftSpeed = fabs(gyroPID.calculatePID(gyroDifference(getGyroSensor(), chassisDistance) * gyroDirection(getGyroSensor(), chassisDistance)));
-          rightSpeed = -fabs(gyroPID.calculatePID(gyroDifference(getGyroSensor(), chassisDistance) * gyroDirection(getGyroSensor(), chassisDistance)));
-        }
-        else if ((gyroDirection(getGyroSensor(), chassisDistance) == -1))
-        {
-          leftSpeed = -fabs(gyroPID.calculatePID(gyroDifference(getGyroSensor(), chassisDistance) * gyroDirection(getGyroSensor(), chassisDistance)));
-          rightSpeed = fabs(gyroPID.calculatePID(gyroDifference(getGyroSensor(), chassisDistance) * gyroDirection(getGyroSensor(), chassisDistance)));
-        }
-        if (fabs(getGyroSensor() - chassisDistance) <= gyroThreshold)
-        {
-          drivePIDTimer.startTimer();
-        }
+      case driveThrough:
 
-        if (drivePIDTimer.currentTime() > 300)
-          this->systemDone = true;
-      }
+        deltaX = targetX - currentX;
+        deltaY = targetY - currentY;
+        direction = atan(deltaY / deltaX);
+        distance = sqrt(pow(deltaX, 2) + pow(deltaY, 2));
 
-      else if (chassisDirection == sweepRight || chassisDirection == forwardRight)
-      {
-        rightDrivePID.setPIDTarget(chassisDistance);
-        chassisSpeed = rightDrivePID.calculatePID(getRightDriveSensor());
-        ;
-        if (chassisDirection == sweepRight)
-        {
-          rightSpeed = chassisSpeed;
-          leftSpeed = chassisSpeed * .5;
-        }
-        else
-        {
-          rightSpeed = chassisSpeed;
-          leftSpeed = 0;
-        }
-        if ((fabs(getRightDriveSensor() - chassisDistance) <= driveThreshold))
+        leftSpeed = rightSpeed = 127;
+
+        leftSpeed += (fabs(leftSpeed) * driveTurnPID.calculatePID(direction - getCurrentAngle()));
+        rightSpeed -= (fabs(rightSpeed) * driveTurnPID.calculatePID(direction - getCurrentAngle()));
+
+        if (distance <= distanceThreshold)
         {
           drivePIDTimer.startTimer();
         }
         if (drivePIDTimer.currentTime() > 300)
           this->systemDone = true;
-      }
-      else if (chassisDirection == sweepLeft || chassisDirection == forwardLeft) // otherwise if the robot is driving with the left drive
-      {
-        leftDrivePID.setPIDTarget(chassisDistance);
-        chassisSpeed = leftDrivePID.calculatePID(getLeftDriveSensor());
-        if (chassisDirection == sweepLeft)
-        {
-          rightSpeed = chassisSpeed * .5;
-          leftSpeed = chassisSpeed;
-        }
-        else
-        {
-          rightSpeed = 0;
-          leftSpeed = chassisSpeed;
-        }
-        if ((fabs(getLeftDriveSensor() - chassisDistance) <= driveThreshold))
+        break;
+
+      case turnToPoint:
+        deltaX = targetX - currentX;
+        deltaY = targetY - currentY;
+        direction = atan(deltaY / deltaX);
+
+        leftSpeed = turnPID.calculatePID(direction - getCurrentAngle());
+        rightSpeed = -leftSpeed;
+
+        if (direction - getCurrentAngle() <= angleThreshold)
         {
           drivePIDTimer.startTimer();
         }
         if (drivePIDTimer.currentTime() > 300)
           this->systemDone = true;
-      }
+        break;
 
-      else if (chassisDirection == driveSpeed)
-      {
-        leftSpeed = chassisSpeed;
-        rightSpeed = chassisSpeed;
-        if (fabs(getLeftDriveSensor()) >= fabs(chassisDistance) && fabs(getRightDriveSensor()) >= fabs(chassisDistance))
-          this->systemDone = true;
-      }
+      case turnToAngle:
+        direction = targetAngle;
 
-      else if (chassisDirection == turnSpeed)
-      {
-        leftSpeed = chassisSpeed;
-        rightSpeed = -chassisSpeed;
+        leftSpeed = turnPID.calculatePID(direction - getCurrentAngle());
+        rightSpeed = -leftSpeed;
 
-        if (fabs(getLeftDriveSensor()) >= fabs(chassisDistance) && fabs(getRightDriveSensor()) >= fabs(chassisDistance))
-          this->systemDone = true;
-      }
-
-      else if (chassisDirection == sweepLeftSpeed || chassisDirection == forwardLeftSpeed)
-      {
-        leftSpeed = chassisSpeed;
-
-        if (chassisDirection == sweepLeft)
-          rightSpeed = chassisSpeed * .5;
-
-        else
-          rightSpeed = 0;
-
-        if (fabs(getLeftDriveSensor()) >= fabs(chassisDistance))
-          this->systemDone = true;
-      }
-
-      else if (chassisDirection == sweepRightSpeed || chassisDirection == forwardRightSpeed)
-      {
-        rightSpeed = chassisSpeed;
-
-        if (chassisDirection == sweepRight)
-          leftSpeed = chassisSpeed * .5;
-
-        else
-          leftSpeed = 0;
-
-        if (fabs(getRightDriveSensor()) >= fabs(chassisDistance))
-          this->systemDone = true;
-      }
-
-      else if (chassisDirection == driveStraightSpeed)
-      {
-        leftSpeed = chassisSpeed;
-        rightSpeed = chassisSpeed;
-
-        if (fabs(getRightDriveSensor()) > fabs(getLeftDriveSensor())) // if the right drive has travelled farther than the left drive
+        if (direction - getCurrentAngle() <= angleThreshold)
         {
-          drivePID.setPIDTarget(getLeftDriveSensor());
-          rightSpeed += drivePID.calculatePID(getRightDriveSensor());
+          drivePIDTimer.startTimer();
         }
-        else if (fabs(getLeftDriveSensor()) > fabs(getRightDriveSensor())) // if the right drive has travelled farther than the left drive
-        {
-          drivePID.setPIDTarget(getRightDriveSensor());
-          rightSpeed += drivePID.calculatePID(getLeftDriveSensor());
-        }
-
-        if (fabs(getLeftDriveSensor()) >= fabs(chassisDistance) && fabs(getRightDriveSensor()) >= fabs(chassisDistance))
+        if (drivePIDTimer.currentTime() > 300)
           this->systemDone = true;
+        break;
+
+      default:
+        leftSpeed = 0;
+        rightSpeed = 0;
       }
-
-      else if (chassisDirection == gyroDriveStraightSpeed)
-      {
-        heading = correctGyroValue(heading);
-        straightGyroPID.setPIDTarget(0);
-        leftSpeed = chassisSpeed;
-        rightSpeed = chassisSpeed;
-
-        if ((gyroDirection(getGyroSensor(), heading) == 1)) // if the robot is drifting left
-        {
-          leftSpeed += fabs(leftSpeed) * fabs(straightGyroPID.calculatePID(gyroDifference(getGyroSensor(), heading) * gyroDirection(getGyroSensor(), heading)));
-          rightSpeed -= fabs(rightSpeed) * fabs(straightGyroPID.calculatePID(gyroDifference(getGyroSensor(), heading) * gyroDirection(getGyroSensor(), heading)));
-        }
-        else if ((gyroDirection(getGyroSensor(), heading) == -1)) //otherwise if the robot is drifting right
-        {
-          leftSpeed -= fabs(leftSpeed) * fabs(straightGyroPID.calculatePID(gyroDifference(getGyroSensor(), heading) * gyroDirection(getGyroSensor(), heading)));
-          rightSpeed += fabs(rightSpeed) * fabs(straightGyroPID.calculatePID(gyroDifference(getGyroSensor(), heading) * gyroDirection(getGyroSensor(), heading)));
-        }
-
-        if (fabs(getLeftDriveSensor()) >= fabs(chassisDistance) && fabs(getRightDriveSensor()) >= fabs(chassisDistance))
-          this->systemDone = true;
-      }
-
-      else if (chassisDirection == gyroTurnSpeed)
-      {
-        heading = correctGyroValue(heading);
-        chassisDistance = correctGyroValue(chassisDistance); // correct the gyro target value
-
-        if ((gyroDirection(getGyroSensor(), chassisDistance) == 1))
-        {
-          leftSpeed = chassisSpeed;
-          rightSpeed = -chassisSpeed;
-        }
-        else if ((gyroDirection(getGyroSensor(), chassisDistance) == -1))
-        {
-          leftSpeed = -chassisSpeed;
-          rightSpeed = chassisSpeed;
-        }
-
-        if (gyroDifference(getGyroSensor(), heading) >= gyroDifference(heading, chassisDistance))
-          this->systemDone = true;
-      }
-
-      else // otherwise
-      {
-        this->systemDone = true; // the drive is done
-      }
-      if (fabs(leftSpeed) > largestDriveInput)
-        leftSpeed = largestDriveInput * sgn(leftSpeed);
-      if (fabs(rightSpeed) > largestDriveInput)
-        rightSpeed = largestDriveInput * sgn(rightSpeed);
 
       moveStraightDrive(leftSpeed, rightSpeed);
     }
-    else // if the drive is done
+  }
+
+  float currentAngle = 0;
+  float currentX = 0;
+  float currentY = 0;
+  float previousLeft = 0;
+  float previousRight = 0;
+  float previousStrafe = 0;
+  bool positionTrackingfirstRun = true;
+
+  float angleVelocity = 0;
+  float xVelocity = 0;
+  float yVelocity = 0;
+  float previousAngle = 0;
+  float previousX = 0;
+  float previousY = 0;
+
+  float velocityRefresh = 100;
+
+  uint32_t previousVelocityCheck = pros::c::millis();
+
+  float getwheelDistanceMoved(float rotationsMoved, float wheelDiameter, float ticksPerRotation)
+  {
+    return wheelDiameter * PI / ticksPerRotation;
+  }
+
+  int getAngleAsGyro()
+  {
+    return (int)((currentAngle * (180 / PI)) * 10);
+  }
+
+  void setPosition(float x, float y, float angle)
+  {
+    currentAngle = angle;
+    currentX = x;
+    currentY = y;
+  }
+
+  void resetPosition()
+  {
+    positionTrackingfirstRun = true;
+    currentAngle = 0;
+    currentX = 0;
+    currentY = 0;
+  }
+
+  void trackVelocity()
+  {
+    if (pros::c::millis() - previousVelocityCheck > velocityRefresh)
     {
-      moveStraightDrive(0, 0);
+      angleVelocity = ((currentAngle - previousAngle) * 1000) / previousVelocityCheck;
+      xVelocity = ((currentX - previousX) * 1000) / previousVelocityCheck;
+      yVelocity = ((currentY - previousY) * 1000) / previousVelocityCheck;
+
+      previousAngle = currentAngle;
+      previousX = currentX;
+      previousY = currentY;
     }
+  }
+
+  void trackPosition()
+  {
+    float left = getAbsoluteLeftDriveSensor();
+    float right = getAbsoluteRightDriveSensor();
+    float strafe = getAbsoluteStrafeDriveSensor();
+
+    float leftWheelDistance = getwheelDistanceMoved(left - previousLeft, leftWheelDiameter, leftTicksPerRotation);
+    float rightWheelDistance = getwheelDistanceMoved(right - previousRight, rightWheelDiameter, rightTicksPerRotation);
+    float strafeWheelDistance = getwheelDistanceMoved(strafe - previousStrafe, strafeWheelDiameter, strafeTicksPerRotation);
+
+    previousLeft = left;
+    previousRight = right;
+    previousStrafe = strafe;
+
+    if (positionTrackingfirstRun)
+    {
+      positionTrackingfirstRun = false;
+      return;
+    }
+
+    float angleChange = (leftWheelDistance - rightWheelDistance) / (leftDistanceFromCenter + rightDistanceFromCenter);
+
+    float distanceTraveled;
+    float distanceTraveledStrafe;
+    float halfAngleChange = angleChange / 2;
+
+    if (angleChange == 0)
+    {
+      distanceTraveled = rightWheelDistance;
+      distanceTraveledStrafe = strafeWheelDistance;
+    }
+    else
+    {
+      float rightRadius = rightWheelDistance / angleChange;
+      float sinHalfAngleChange = sin(halfAngleChange);
+      distanceTraveled = ((rightRadius + rightDistanceFromCenter) * sinHalfAngleChange) * 2.0;
+
+      float strafeRadius = strafeWheelDistance / angleChange;
+      distanceTraveledStrafe = ((strafeRadius + strafeDistanceFromCenter) * sinHalfAngleChange) * 2.0;
+    }
+
+    float cosAngleTraveled = cos(halfAngleChange + currentAngle);
+    float sinAngleTraveled = sin(halfAngleChange + currentAngle);
+
+    currentY += distanceTraveled * cosAngleTraveled;
+    currentX += distanceTraveled * sinAngleTraveled;
+
+    currentY += distanceTraveledStrafe * cosAngleTraveled;
+    currentX += distanceTraveledStrafe * sinAngleTraveled;
+
+    currentAngle += angleChange;
   }
 };
 

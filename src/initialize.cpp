@@ -6,7 +6,6 @@
 #include "headers/robotFunction.h"
 #include "headers/autonomous.h"
 #include "headers/opcontrol.h"
-#include "headers/positionTracker.h"
 
 pros::Motor motorOne(FIRSTPORT);
 pros::Motor motorTwo(SECONDPORT);
@@ -21,8 +20,6 @@ driveMotor driveMotors[TOTAL_MOTORS];
 
 robotDrive mainDrive;
 
-positionTracker mainDrivePositionTracker;
-
 pros::ADIGyro driveGyro(1);
 
 robotFunction autonRobotFunction;
@@ -30,7 +27,6 @@ systems *systemsArray[NUMBER_OF_SYSTEMS];
 
 #include "userIncludes/taskFunctions.cpp"
 
-pros::Task runRobotFunctionTask(runRobotFunctionTaskFn, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "runRobotFunctionTask");
 pros::Task autonomousInUserControlTask(autonomousInUserControlFn, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "autonomousInUserControlTask");
 pros::Task slewMotorsTask(slewMotors, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "slewMotorsTask");
 pros::Task mainDrivePositionTrackerTask(mainDrivePositionTrackerFn, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "mainDrivePositionTrackerTask");

@@ -1,7 +1,6 @@
 #include "main.h"
 #include "headers/autons.h"
 #include "headers/lcdCode.h"
-#include "headers/robotFunction.h"
 #include "headers/initialize.h"
 /**
 * Runs the user autonomous code. This function will be started in its own task

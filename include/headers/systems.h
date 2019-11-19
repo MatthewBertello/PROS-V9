@@ -3,26 +3,35 @@
 #define systems_h
 
 #include "headers/timer.h"
+#include <vector>
 
 class systems
 {
 
 public:
 
-  enum systemTypes
-  {
-    DRIVE
-  };
-  systemTypes systemType;
   bool systemDone;
+  bool systemCompleted;
   timer systemTimer = timer();
   int systemMaxTime;
+  int systemReadPos = 0;
 
+  std::vector<int> systemCommands;
 
-virtual void executeSystemFunction()
-{
-}
-
+  virtual int addSystemCommands(int i, std::vector<int> &commands)
+  {
+  }
+  virtual void executeSystemFunction()
+  {
+  }
+  virtual bool updateSystem()
+  {
+  }
+  void resetSystemCommads()
+  {
+    systemCommands.clear();
+    systemReadPos = 0;
+  }
 };
 
 #endif

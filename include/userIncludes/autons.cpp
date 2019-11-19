@@ -13,79 +13,9 @@
 #include "headers/autonomous.h"
 #include "headers/initialize.h"
 
-void insertManualCommands()
-{
-  while(!autonRobotFunction.finishedReading())
-  {
-    pros::delay(5);
-  }
-  runningRunRobotFunctionTask = false;
-}
-
-void resumeAuton()
-{
-  autonRobotFunction.resetRobotFunction();
-  runningRunRobotFunctionTask = true;
-}
-
-enum Actions
-{
-  pause,
-  pauseAll,
-  maxTime,
-  end
-};
-
-enum driveCommands
-{
-  pid,
-  sweepRight,
-  sweepLeft,
-  forwardRight,
-  forwardLeft,
-  driveStraight,
-  gyroDriveStraight,
-  gyroTurn,
-
-  PIDDriveCommandMaxValue,
-
-  speed,
-  driveSpeed,
-  turnSpeed,
-  sweepRightSpeed,
-  sweepLeftSpeed,
-  forwardRightSpeed,
-  forwardLeftSpeed,
-  driveStraightSpeed,
-  gyroDriveStraightSpeed,
-  gyroTurnSpeed,
-
-  driveCommandMaxValue,
-};
-
-enum currentSystems
-{
-  base
-};
-
-enum Commands
-{
-  unWritten,
-  goToStart,
-  isASystem,
-  isAnAction,
-};
-
 // //autonomous routines
 void autonomous1 ()
 {
-  syscom(base, gyroDriveStraight, 0, 2500);
-  actcom(maxTime, base, 1000);
-  addcom(atn, pause, base, stm, base, gyroTurn, 900);
-  insertManualCommands();
-  pros::delay(3000);
-  resumeAuton();
-  syscom(base, gyroTurn, 0);
 }
 void autonomous2 ()
 {

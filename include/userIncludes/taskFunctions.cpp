@@ -3,6 +3,13 @@
 #ifndef taskFunctions_cpp
 #define TaskFunctions_cpp
 
+#include "headers/opcontrol.h"
+#include "headers/autonomous.h"
+#include "headers/driveMotor.h"
+#include "headers/initialize.h"
+
+
+
 void autonomousInUserControlFn(void *param)
 {
   while (true)
@@ -14,24 +21,6 @@ void autonomousInUserControlFn(void *param)
       pros::delay(10);
     }
     pros::delay(10);
-  }
-}
-
-void runRobotFunctionTaskFn(void *param)
-{
-  while (true)
-  {
-    while (pros::competition::is_autonomous || runningRunRobotFunctionTask)
-    {
-      autonRobotFunction.exectueRobotFunction();
-      pros::delay(1);
-    }
-
-    while (!pros::competition::is_autonomous && !runningRunRobotFunctionTask)
-    {
-      autonRobotFunction.resetRobotFunction();
-      pros::delay(10);
-    }
   }
 }
 
@@ -82,8 +71,8 @@ void mainDrivePositionTrackerFn(void *param)
   while (true)
   {
     lastRun = pros::c::millis();
-    mainDrivePositionTracker.trackPosition();
-    mainDrivePositionTracker.trackVelocity();
+    mainDrive.trackPosition();
+    mainDrive.trackVelocity();
     pros::c::task_delay_until(&lastRun, 1);
   }
 }
