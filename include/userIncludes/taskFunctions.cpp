@@ -8,22 +8,6 @@
 #include "headers/driveMotor.h"
 #include "headers/initialize.h"
 
-
-
-void autonomousInUserControlFn(void *param)
-{
-  while (true)
-  {
-    while (runningAutoninUserControl)
-    {
-      autonomous();
-      runningAutoninUserControl = false;
-      pros::delay(10);
-    }
-    pros::delay(10);
-  }
-}
-
 void slewMotors(void *param)
 {
   uint32_t lastRun = pros::c::millis();
@@ -73,7 +57,7 @@ void mainDrivePositionTrackerFn(void *param)
     lastRun = pros::c::millis();
     mainDrive.trackPosition();
     mainDrive.trackVelocity();
-    pros::c::task_delay_until(&lastRun, 1);
+    pros::c::task_delay_until(&lastRun, DRIVE_TRACKER_REFRESH_RATE);
   }
 }
 #endif

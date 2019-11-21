@@ -13,7 +13,7 @@ public:
   bool systemDone;
   bool systemCompleted;
   timer systemTimer = timer();
-  int systemMaxTime;
+  int systemMaxTime = 0;
   int systemReadPos = 0;
 
   std::vector<int> systemCommands;

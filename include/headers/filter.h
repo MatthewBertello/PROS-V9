@@ -2,22 +2,20 @@
 #ifndef filters_h
 #define filters_h
 
+#include "headers/config.h"
 #include <cmath>
 
 class emaFilter
 {
-	int period;
-	float alpha;
-	float currentValue;
-	float previousValue;
+	int period = DEFAULT_EMA_FILTER_PERIOD;
+	float alpha;;
+	float currentValue = 0;
+	float previousValue = 0;
 
 public:
 
 	emaFilter()
 	{
-		this->period = 10;
-		this->currentValue = 0;
-		this->previousValue = 0;
 		this->alpha = (2/((float)this->period+1));
 	}
 
@@ -44,27 +42,22 @@ public:
 
 class demaFilter
 {
-	int period1;
+	int period1 = DEFAULT_DEMA_FILTER_PERIOD;
 	float alpha1;
-	float currentValue1;
-	float previousValue1;
-	int period2;
+	float currentValue1 = 0;
+	float previousValue1 = 0;
+	int period2 = DEFAULT_DEMA_FILTER_PERIOD;
 	float alpha2;
-	float currentValue2;
-	float previousValue2;
+	float currentValue2 = 0;
+	float previousValue2 = 0;
 	float output;
 
 public:
 
 	demaFilter()
 	{
-		this->period1 = 10;
-		this->currentValue1 = 0;
 		this->alpha1 = (2/((float)this->period1+1));
-		this->period2 = 10;
-		this->currentValue2 = 0;
 		this->alpha2 = (2/((float)this->period2+1));
-		this->output = 0;
 	}
 
 	demaFilter(int length1, int length2, float initialValue)
@@ -99,38 +92,24 @@ public:
 
 class medianFilter
 {
-	int width;
-	float previousValues[100];
+	int width = MEDIAN_FILTER_DEFAULT_WIDTH;
+	float previousValues[MEDIAN_FILTER_MAX_VALUES] = {0};
 	float currentValue;
 public:
 
-	medianFilter()
-	{
-		this->width = 10;
-		this->currentValue = 0;
-		int y = 0;
-		while(y < 50)
-		{
-			this->previousValues[y] = 0;
-			y++;
-		}
-	}
-
 	medianFilter(int width, float initialValue)
 	{
-		this->width = width;
-		this->currentValue = initialValue;
-		int y = 0;
-		while(y < 50)
+		width = width;
+		currentValue = initialValue;
+		for (int i = 0; i < MEDIAN_FILTER_MAX_VALUES; i++)
 		{
-			this->previousValues[y] = initialValue;
-			y++;
+			previousValues[i] = initialValue;
 		}
 	}
 
 	float filterMedian(float input)
 	{
-		float tempArray[50];
+		float tempArray[MEDIAN_FILTER_MAX_VALUES];
 		int y = this->width-1;
 		while(y > 0)
 		{
@@ -163,17 +142,6 @@ public:
 		this->currentValue = tempArray[static_cast<int>(floor(this->width/2))];
 		return this->currentValue;
 
-	}
-
-	void resetMedianFilter(float initialValue)
-	{
-		this->currentValue = initialValue;
-		int y = 0;
-		while(y < 50)
-		{
-			this->previousValues[y] = initialValue;
-			y++;
-		}
 	}
 
 	float getMedian(medianFilter *filter)

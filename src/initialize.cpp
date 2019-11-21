@@ -27,7 +27,6 @@ systems *systemsArray[NUMBER_OF_SYSTEMS];
 
 #include "userIncludes/taskFunctions.cpp"
 
-pros::Task autonomousInUserControlTask(autonomousInUserControlFn, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "autonomousInUserControlTask");
 pros::Task slewMotorsTask(slewMotors, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "slewMotorsTask");
 pros::Task mainDrivePositionTrackerTask(mainDrivePositionTrackerFn, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "mainDrivePositionTrackerTask");
 

@@ -6,23 +6,20 @@
 #include "pros/rtos.hpp"
 #include "headers/config.h"
 
+class driveMotor
+{
 
-class driveMotor{
-
-  int requestedSpeed;
-  int currentSpeed;
-  int slewRate;
-  bool shouldSlew;
+  int requestedSpeed = 0;
+  int currentSpeed = 0;
+  float slewRate = DEFAULT_SLEW_RATE;
+  bool shouldSlew = SHOULD_SLEW_BY_DEFAULT;
   pros::Motor *motorPointer;
 
-
 public:
-
   driveMotor()
   {
     this->requestedSpeed = 0;
     this->currentSpeed = 0;
-    this->slewRate = DEFAULT_SLEW_RATE;
     this->shouldSlew = true;
     this->motorPointer = nullptr;
   }
@@ -37,7 +34,7 @@ public:
     return this->currentSpeed;
   }
 
-  int getSlewRate()
+  float getSlewRate()
   {
     return this->slewRate;
   }
@@ -60,11 +57,6 @@ public:
   void setCurrentSpeed(int currentSpeed)
   {
     this->currentSpeed = currentSpeed;
-  }
-
-  void setSlewRate(int slewRate)
-  {
-    this->slewRate = slewRate;
   }
 
   void disableSlew()
@@ -92,58 +84,6 @@ public:
     this->currentSpeed = speed;
     this->requestedSpeed = speed;
   }
-
-  // void slewMotors(void* param)
-  // {
-  //   driveMotors[0].setMotorPointer(motorOne);
-  //   driveMotors[1].setMotorPointer(motorTwo);
-  //   driveMotors[2].setMotorPointer(motorThree);
-  //   driveMotors[3].setMotorPointer(motorFour);
-  //   driveMotors[4].setMotorPointer(motorFive);
-  //   driveMotors[5].setMotorPointer(motorSix);
-  //   driveMotors[6].setMotorPointer(motorSeven);
-  //   driveMotors[7].setMotorPointer(motorEight);
-  //   driveMotors[7].getMotorPointer();
-  //
-  //   uint32_t lastRun = pros::c::millis();
-  //   int motorIndex = 0;
-  //   driveMotor *x;
-  //
-  //   while(true)
-  //   {
-  //     while(motorIndex < TOTAL_MOTORS)
-  //     {
-  //       x = &(driveMotors[motorIndex]);
-  //
-  //       if(x->slewEnabled())
-  //       {
-  //         if(x->getCurrentSpeed() < x->getRequestedSpeed())
-  //         {
-  //           x->setCurrentSpeed(x->getCurrentSpeed() + x->getSlewRate());
-  //           x->setCurrentSpeed((x->getCurrentSpeed() > x->getRequestedSpeed()) ? x->getRequestedSpeed():x->getCurrentSpeed());
-  //         }
-  //         if(x->getCurrentSpeed() > x->getRequestedSpeed())
-  //         {
-  //           x->setCurrentSpeed(x->getCurrentSpeed() - x->getSlewRate());
-  //           x->setCurrentSpeed((x->getCurrentSpeed() < x->getRequestedSpeed()) ? x->getRequestedSpeed():x->getCurrentSpeed());
-  //         }
-  //         x->setCurrentSpeed((x->getCurrentSpeed() > MAX_MOTOR_SPEED) ? MAX_MOTOR_SPEED:x->getCurrentSpeed());
-  //         x->setCurrentSpeed((x->getCurrentSpeed() < MIN_MOTOR_SPEED) ? MIN_MOTOR_SPEED:x->getCurrentSpeed());
-  //
-  //         x->getMotorPointer()->move(x->getCurrentSpeed());
-  //       }
-  //       else
-  //       {
-  //         x->getMotorPointer()->move(x->getRequestedSpeed());
-  //       }
-  //       motorIndex++;
-  //     }
-  //     motorIndex = 0;
-  //     pros::c::task_delay_until(&lastRun, SLEW_REFRESH_RATE);
-  //     lastRun = pros::c::millis();
-  //   }
-  // }
-
 };
 
 #endif

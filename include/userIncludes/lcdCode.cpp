@@ -37,7 +37,7 @@ void decreaseAutonomousMode()
   {
     autonomousMode--;
     if (autonomousMode < 1)
-      autonomousMode = 16;
+      autonomousMode = MAX_AUTONOMOUS_MODES;
   }
 }
 
@@ -56,7 +56,7 @@ void increaseAutonomousMode()
   if (rightButtonPressed)
   {
     autonomousMode++;
-    if (autonomousMode > 16)
+    if (autonomousMode > MAX_AUTONOMOUS_MODES)
       autonomousMode = 1;
   }
 }

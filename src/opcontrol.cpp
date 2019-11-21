@@ -42,7 +42,7 @@ void opcontrol()
     {
       singleControllerDrive(); // use the one controller drive code
     }
-    pros::c::task_delay_until(&lastRun, 5);
+    pros::c::task_delay_until(&lastRun, OP_CONTROL_REFRESH_RATE);
     lastRun = pros::c::millis();
   }
 }
@@ -79,25 +79,25 @@ void doubleControllerDrive()
 
   mainDrive.moveStraightDrive(leftIn, rightIn);
 
-  if (master.get_digital(pros::E_CONTROLLER_DIGITAL_X))
-  {
-    while (master.get_digital(pros::E_CONTROLLER_DIGITAL_X))
-    {
-      pros::delay(5);
-    }
-    runningRunRobotFunctionTask = true;
-    runningAutoninUserControl = true;
-    while (!master.get_digital(pros::E_CONTROLLER_DIGITAL_X))
-    {
-      pros::delay(5);
-    }
-    runningRunRobotFunctionTask = false;
-    runningAutoninUserControl = false;
-    while (master.get_digital(pros::E_CONTROLLER_DIGITAL_X))
-    {
-      pros::delay(5);
-    }
-  }
+//   if (master.get_digital(pros::E_CONTROLLER_DIGITAL_X))
+//   {
+//     while (master.get_digital(pros::E_CONTROLLER_DIGITAL_X))
+//     {
+//       pros::delay(5);
+//     }
+//     runningRunRobotFunctionTask = true;
+//     runningAutoninUserControl = true;
+//     while (!master.get_digital(pros::E_CONTROLLER_DIGITAL_X))
+//     {
+//       pros::delay(5);
+//     }
+//     runningRunRobotFunctionTask = false;
+//     runningAutoninUserControl = false;
+//     while (master.get_digital(pros::E_CONTROLLER_DIGITAL_X))
+//     {
+//       pros::delay(5);
+//     }
+//   }
 }
 
 void singleControllerDrive()

@@ -68,20 +68,20 @@ public:
   float rightDriveSensorLastReset = 0;
   float strafeDriveSensorLastReset = 0;
 
-  float leftWheelDiameter = 2.783;
-  float rightWheelDiameter = 2.783;
-  float strafeWheelDiameter = 2.783;
+  float leftWheelDiameter = ROBOT_DRIVE_DEFAULT_WHEEL_DIAMETER;
+  float rightWheelDiameter = ROBOT_DRIVE_DEFAULT_WHEEL_DIAMETER;
+  float strafeWheelDiameter = ROBOT_DRIVE_DEFAULT_WHEEL_DIAMETER;
 
-  float leftDistanceFromCenter = 8;
-  float rightDistanceFromCenter = 8;
-  float strafeDistanceFromCenter = 8;
+  float leftDistanceFromCenter = ROBOT_DRIVE_DEFAULT_WHEEL_DISTANCE_FROM_CENTER;
+  float rightDistanceFromCenter = ROBOT_DRIVE_DEFAULT_WHEEL_DISTANCE_FROM_CENTER;
+  float strafeDistanceFromCenter = ROBOT_DRIVE_DEFAULT_WHEEL_DISTANCE_FROM_CENTER;
 
-  float leftTicksPerRotation = 360.0;
-  float rightTicksPerRotation = 360.0;
-  float strafeTicksPerRotation = 360.0;
+  float leftTicksPerRotation = ROBOT_DRIVE_DEFAULT_WHEEL_TICKS_PER_ROTATION;
+  float rightTicksPerRotation = ROBOT_DRIVE_DEFAULT_WHEEL_TICKS_PER_ROTATION;
+  float strafeTicksPerRotation = ROBOT_DRIVE_DEFAULT_WHEEL_TICKS_PER_ROTATION;
 
-  int distanceThreshold = 25;
-  int angleThreshold = 50;
+  float distanceThreshold = ROBOT_DRIVE_DEFAULT_DISTANCE_THRESHOLD;
+  float angleThreshold = ROBOT_DRIVE_DEFAULT_ANGLE_THRESHOLD;
 
   float heading = 0;
 
@@ -469,8 +469,6 @@ public:
   float previousX = 0;
   float previousY = 0;
 
-  float velocityRefresh = 100;
-
   uint32_t previousVelocityCheck = pros::c::millis();
 
   float getwheelDistanceMoved(float rotationsMoved, float wheelDiameter, float ticksPerRotation)
@@ -500,8 +498,6 @@ public:
 
   void trackVelocity()
   {
-    if (pros::c::millis() - previousVelocityCheck > velocityRefresh)
-    {
       angleVelocity = ((currentAngle - previousAngle) * 1000) / previousVelocityCheck;
       xVelocity = ((currentX - previousX) * 1000) / previousVelocityCheck;
       yVelocity = ((currentY - previousY) * 1000) / previousVelocityCheck;
@@ -509,7 +505,6 @@ public:
       previousAngle = currentAngle;
       previousX = currentX;
       previousY = currentY;
-    }
   }
 
   void trackPosition()

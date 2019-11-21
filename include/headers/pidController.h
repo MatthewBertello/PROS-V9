@@ -34,33 +34,9 @@ class PIDController
 
 public:
 
-	PIDController()
-	{
-		this->integralLimit = 99999999;
-		this->lowerIntegralBand = 0;
-
-		this->upperIntegralBand = 999999999;
-		this->resetIntegralAtCross = false;
-
-		this->changeConstantDirection = false;
-
-		this->previousTime = pros::c::millis();
-		this->target = 0;
-
-		this->xp = 1;
-		this->xi = 1;
-		this->xd = 1;
-		this->xc = 0;
-		this->currentC = 0;
-
-		this->lastError = 0;
-
-		this->integral = 0;
-		this->derivative = 0;
-
-	}
-
-	PIDController(float xp, float xi, float xd, float xc, float integralLimit, float lowerIntegralBand, float upperIntegralBand,  bool resetIntegralAtCross, bool changeConstantDirection)
+	PIDController(float xp = DEFAULT_PID_P, float xi = DEFAULT_PID_I, float xd = DEFAULT_PID_D, float xc = DEFAULT_PID_C, float integralLimit = DEFAULT_PID_INTEGRAL_LIMIT,
+	float lowerIntegralBand = DEFAULT_PID_LOWER_INTEGRAL_BAND, float upperIntegralBand = DEFAULT_PID_UPPER_INTEGRAL_BAND,  bool resetIntegralAtCross = DEFAULT_PID_RESET_INTEGRAL_AT_CROSS, 
+	bool changeConstantDirection = DEFAULT_PID_CHANGE_CONSTANT_DIRECTION)
 	{
 		this->integralLimit = integralLimit;
 		this->lowerIntegralBand = lowerIntegralBand;
