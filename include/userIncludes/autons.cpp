@@ -21,9 +21,16 @@ void autonomous1()
 {
     autonRobotFunction.addCommands(
         base, driveTo, 0, 10,
-        base, driveThrough, 0, 20,
+        base, driveTo, 10, 10,
+        base, driveTo, 10, 0,
+        base, driveTo, 0, 0,
+        base, driveThrough, 0, 10,
         base, turnToPoint, 0, 0,
         base, turnToAngle, 0
+    );
+    pros::delay(2000);
+    autonRobotFunction.addCommands(
+        base, turnToAngle, 180
     );
 }
 void autonomous2()

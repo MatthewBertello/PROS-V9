@@ -15,14 +15,14 @@ const int SEVENTHPORT = 7;
 const int EIGTHPORT = 8;
 
 
-const int FRONTLEFTDRIVE = 0; // port 1
-const int FRONTRIGHTDRIVE = 1; // port 2
-const int BACKLEFTDRIVE = 2; // port 3
-const int BACKRIGHTDRIVE = 3; // port 4
-const int STRAFEWHEEL = 4; // port 5
-const int INTAKEMOTOR = 5; // port 6
-const int SHOOTER = 6; // port 7
-const int LIFTMOTOR = 7; // port 8
+const int FRONTLEFTDRIVE /*FIRSTPORT*/ = 0;
+const int FRONTRIGHTDRIVE /*SECONDPORT*/ = 1;
+const int BACKLEFTDRIVE /*THIRDPORT*/ = 2;
+const int BACKRIGHTDRIVE /*FOURTHPORT*/ = 3;
+const int STRAFEWHEEL /*FIFTHPORT*/ = 4;
+const int INTAKEMOTOR /*SIXTHPORT*/ = 5;
+const int SHOOTER /*SEVENTHPORT*/ = 6;
+const int LIFTMOTOR /*EIGTHPORT*/ = 7;
 
 //driveMotor.h
 const float DEFAULT_SLEW_RATE = 8;

@@ -35,11 +35,11 @@ void slewMotors(void *param)
         x->setCurrentSpeed((x->getCurrentSpeed() > MAX_MOTOR_SPEED) ? MAX_MOTOR_SPEED : x->getCurrentSpeed());
         x->setCurrentSpeed((x->getCurrentSpeed() < MIN_MOTOR_SPEED) ? MIN_MOTOR_SPEED : x->getCurrentSpeed());
 
-        x->getMotorPointer()->move(x->getCurrentSpeed());
+        x->move(x->getCurrentSpeed());
       }
       else
       {
-        x->getMotorPointer()->move(x->getRequestedSpeed());
+        x->move(x->getRequestedSpeed());
       }
       motorIndex++;
     }

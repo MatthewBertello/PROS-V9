@@ -1,8 +1,8 @@
 #include "main.h"
 #include "headers/opcontrol.h"
-#include "headers/autonomous.h"
 #include "headers/initialize.h"
 #include "headers/lcdCode.h"
+#include "headers/robotDrive.h"
 
 /**
 * Runs the operator control code. This function will be started in its own task
@@ -20,7 +20,6 @@
 bool curve = false;    // should the robot use the parametric drive formula
 bool inversed = false; // should the drive be inversed
 bool control = false;  // should the drive be in control mode
-bool runningAutoninUserControl = false;
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 pros::Controller partner(pros::E_CONTROLLER_PARTNER);
@@ -28,7 +27,9 @@ pros::Controller partner(pros::E_CONTROLLER_PARTNER);
 void opcontrol()
 {
   uint32_t lastRun = pros::c::millis();
-  pros::lcd::set_text(1, "Hello PROS User!u");
+  pros::lcd::print(0, "X =  %d", mainDrive.currentX);
+  pros::lcd::print(1, "Y =  %d", mainDrive.currentY);
+  pros::lcd::print(2, "A =  %d", mainDrive.currentAngle);
 
   while (true) // infinite while loop
   {
@@ -79,25 +80,6 @@ void doubleControllerDrive()
 
   mainDrive.moveStraightDrive(leftIn, rightIn);
 
-//   if (master.get_digital(pros::E_CONTROLLER_DIGITAL_X))
-//   {
-//     while (master.get_digital(pros::E_CONTROLLER_DIGITAL_X))
-//     {
-//       pros::delay(5);
-//     }
-//     runningRunRobotFunctionTask = true;
-//     runningAutoninUserControl = true;
-//     while (!master.get_digital(pros::E_CONTROLLER_DIGITAL_X))
-//     {
-//       pros::delay(5);
-//     }
-//     runningRunRobotFunctionTask = false;
-//     runningAutoninUserControl = false;
-//     while (master.get_digital(pros::E_CONTROLLER_DIGITAL_X))
-//     {
-//       pros::delay(5);
-//     }
-//   }
 }
 
 void singleControllerDrive()

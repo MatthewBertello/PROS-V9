@@ -6,22 +6,17 @@
 #include "pros/rtos.hpp"
 #include "headers/config.h"
 
-class driveMotor
+class driveMotor : public pros::Motor
 {
 
   int requestedSpeed = 0;
   int currentSpeed = 0;
   float slewRate = DEFAULT_SLEW_RATE;
   bool shouldSlew = SHOULD_SLEW_BY_DEFAULT;
-  pros::Motor *motorPointer;
 
 public:
-  driveMotor()
+  driveMotor(int port) : pros::Motor(port)
   {
-    this->requestedSpeed = 0;
-    this->currentSpeed = 0;
-    this->shouldSlew = true;
-    this->motorPointer = nullptr;
   }
 
   int getRequestedSpeed()
@@ -44,11 +39,6 @@ public:
     return this->shouldSlew;
   }
 
-  pros::Motor *getMotorPointer()
-  {
-    return this->motorPointer;
-  }
-
   void setRequestedSpeed(int requestedSpeed)
   {
     this->requestedSpeed = requestedSpeed;
@@ -67,11 +57,6 @@ public:
   void enableSlew()
   {
     this->shouldSlew = true;
-  }
-
-  void setMotorPointer(pros::Motor motor)
-  {
-    this->motorPointer = &motor;
   }
 
   void setMotor(int speed)

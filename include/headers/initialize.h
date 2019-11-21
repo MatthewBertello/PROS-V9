@@ -9,13 +9,13 @@
 #include "headers/robotFunction.h"
 #include "pros/motors.hpp"
 
-extern pros::Motor motorOne;
-extern pros::Motor motorThree;
-extern pros::Motor motorFour;
-extern pros::Motor motorFive;
-extern pros::Motor motorSix;
-extern pros::Motor motorSeven;
-extern pros::Motor motorEight;
+extern driveMotor motorOne;
+extern driveMotor motorThree;
+extern driveMotor motorFour;
+extern driveMotor motorFive;
+extern driveMotor motorSix;
+extern driveMotor motorSeven;
+extern driveMotor motorEight;
 
 extern driveMotor driveMotors[TOTAL_MOTORS];
 

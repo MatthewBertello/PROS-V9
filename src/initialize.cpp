@@ -7,16 +7,16 @@
 #include "headers/autonomous.h"
 #include "headers/opcontrol.h"
 
-pros::Motor motorOne(FIRSTPORT);
-pros::Motor motorTwo(SECONDPORT);
-pros::Motor motorThree(THIRDPORT);
-pros::Motor motorFour(FOURTHPORT);
-pros::Motor motorFive(FIFTHPORT);
-pros::Motor motorSix(SIXTHPORT);
-pros::Motor motorSeven(SEVENTHPORT);
-pros::Motor motorEight(EIGTHPORT);
+driveMotor motorOne(FIRSTPORT);
+driveMotor motorTwo(SECONDPORT);
+driveMotor motorThree(THIRDPORT);
+driveMotor motorFour(FOURTHPORT);
+driveMotor motorFive(FIFTHPORT);
+driveMotor motorSix(SIXTHPORT);
+driveMotor motorSeven(SEVENTHPORT);
+driveMotor motorEight(EIGTHPORT);
 
-driveMotor driveMotors[TOTAL_MOTORS];
+driveMotor driveMotors[TOTAL_MOTORS] = {motorOne, motorTwo, motorThree, motorFour, motorFive, motorSix, motorSeven, motorEight};
 
 robotDrive mainDrive;
 
@@ -47,45 +47,36 @@ void initialize()
 {
   pros::lcd::initialize();
 
-  driveMotors[0].setMotorPointer(motorOne);
-  driveMotors[1].setMotorPointer(motorTwo);
-  driveMotors[2].setMotorPointer(motorThree);
-  driveMotors[3].setMotorPointer(motorFour);
-  driveMotors[4].setMotorPointer(motorFive);
-  driveMotors[5].setMotorPointer(motorSix);
-  driveMotors[6].setMotorPointer(motorSeven);
-  driveMotors[7].setMotorPointer(motorEight);
+  driveMotors[0].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+  driveMotors[1].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+  driveMotors[2].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+  driveMotors[3].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+  driveMotors[4].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+  driveMotors[5].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+  driveMotors[6].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+  driveMotors[7].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 
-  driveMotors[0].getMotorPointer()->set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[1].getMotorPointer()->set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[2].getMotorPointer()->set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[3].getMotorPointer()->set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[4].getMotorPointer()->set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[5].getMotorPointer()->set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[6].getMotorPointer()->set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[7].getMotorPointer()->set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+  driveMotors[0].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+  driveMotors[1].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+  driveMotors[2].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+  driveMotors[3].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+  driveMotors[4].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+  driveMotors[5].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+  driveMotors[6].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+  driveMotors[7].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 
-  driveMotors[0].disableSlew();
-  driveMotors[1].disableSlew();
-  driveMotors[2].disableSlew();
-  driveMotors[3].disableSlew();
-  driveMotors[4].disableSlew();
-  driveMotors[5].disableSlew();
-  driveMotors[6].disableSlew();
-  driveMotors[7].disableSlew();
+  driveMotors[FRONTLEFTDRIVE].set_gearing(pros::E_MOTOR_GEARSET_18);
+  driveMotors[FRONTRIGHTDRIVE].set_gearing(pros::E_MOTOR_GEARSET_18);
+  driveMotors[BACKLEFTDRIVE].set_gearing(pros::E_MOTOR_GEARSET_18);
+  driveMotors[BACKRIGHTDRIVE].set_gearing(pros::E_MOTOR_GEARSET_18);
+  driveMotors[INTAKEMOTOR].set_gearing(pros::E_MOTOR_GEARSET_06);
+  driveMotors[SHOOTER].set_gearing(pros::E_MOTOR_GEARSET_36);
+  driveMotors[LIFTMOTOR].set_gearing(pros::E_MOTOR_GEARSET_36);
 
-  driveMotors[FRONTLEFTDRIVE].getMotorPointer()->set_gearing(pros::E_MOTOR_GEARSET_18);
-  driveMotors[FRONTRIGHTDRIVE].getMotorPointer()->set_gearing(pros::E_MOTOR_GEARSET_18);
-  driveMotors[BACKLEFTDRIVE].getMotorPointer()->set_gearing(pros::E_MOTOR_GEARSET_18);
-  driveMotors[BACKRIGHTDRIVE].getMotorPointer()->set_gearing(pros::E_MOTOR_GEARSET_18);
-  driveMotors[INTAKEMOTOR].getMotorPointer()->set_gearing(pros::E_MOTOR_GEARSET_06);
-  driveMotors[SHOOTER].getMotorPointer()->set_gearing(pros::E_MOTOR_GEARSET_36);
-  driveMotors[LIFTMOTOR].getMotorPointer()->set_gearing(pros::E_MOTOR_GEARSET_36);
-
-  driveMotors[FRONTRIGHTDRIVE].getMotorPointer()->set_reversed(true);
-  driveMotors[BACKRIGHTDRIVE].getMotorPointer()->set_reversed(true);
-  driveMotors[SHOOTER].getMotorPointer()->set_reversed(true);
-  driveMotors[INTAKEMOTOR].getMotorPointer()->set_reversed(true);
+  driveMotors[FRONTRIGHTDRIVE].set_reversed(true);
+  driveMotors[BACKRIGHTDRIVE].set_reversed(true);
+  driveMotors[SHOOTER].set_reversed(true);
+  driveMotors[INTAKEMOTOR].set_reversed(true);
 
   mainDrive.addLeftMotor(&driveMotors[FRONTLEFTDRIVE]);
   mainDrive.addLeftMotor(&driveMotors[BACKLEFTDRIVE]);

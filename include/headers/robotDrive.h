@@ -276,7 +276,7 @@ public:
     else
     {
       if (leftMotors[0] != nullptr)
-        return leftMotors[0]->getMotorPointer()->get_position();
+        return leftMotors[0]->get_position();
       else
         return 0;
     }
@@ -290,7 +290,7 @@ public:
     else
     {
       if (rightMotors[0] != nullptr)
-        return rightMotors[0]->getMotorPointer()->get_position();
+        return rightMotors[0]->get_position();
       else
         return 0;
     }
@@ -304,7 +304,7 @@ public:
     else
     {
       if (strafeMotors[0] != nullptr)
-        return strafeMotors[0]->getMotorPointer()->get_position();
+        return strafeMotors[0]->get_position();
       else
         return 0;
     }
@@ -318,7 +318,7 @@ public:
     else
     {
       if (leftMotors[0] != nullptr)
-        return leftMotors[0]->getMotorPointer()->get_position() - leftDriveSensorLastReset;
+        return leftMotors[0]->get_position() - leftDriveSensorLastReset;
       else
         return 0;
     }
@@ -332,7 +332,7 @@ public:
     else
     {
       if (leftMotors[0] != nullptr)
-        return rightMotors[0]->getMotorPointer()->get_position() - rightDriveSensorLastReset;
+        return rightMotors[0]->get_position() - rightDriveSensorLastReset;
       else
         return 0;
     }
@@ -346,7 +346,7 @@ public:
     else
     {
       if (leftMotors[0] != nullptr)
-        return strafeMotors[0]->getMotorPointer()->get_position() - strafeDriveSensorLastReset;
+        return strafeMotors[0]->get_position() - strafeDriveSensorLastReset;
       else
         return 0;
     }

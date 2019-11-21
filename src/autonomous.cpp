@@ -16,7 +16,6 @@
 
 bool autonomousSelected = false;
 int autonomousMode = DEFAULT_AUTONOMOUS_MODE;
-bool runningRunRobotFunctionTask = false;
 
 void autonomous()
 {

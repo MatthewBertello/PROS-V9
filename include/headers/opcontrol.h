@@ -9,8 +9,6 @@ extern bool curve;// should the robot use the parametric drive formula
 extern bool inversed;// should the drive be inversed
 extern bool control;// should the drive be in control mode
 
-extern bool runningAutoninUserControl;
-
 void singleControllerDrive();
 void doubleControllerDrive();
 void userAutonomous(void* param);
