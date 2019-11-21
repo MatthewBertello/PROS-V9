@@ -12,6 +12,8 @@
 #include "headers/timer.h"
 #include "headers/pidController.h"
 
+extern systems *systemsArray[NUMBER_OF_SYSTEMS];
+
 class robotDrive : public systems
 {
 
@@ -25,6 +27,10 @@ public:
 
   enum driveCommands
   {
+    waitFor,
+    maxTime,
+    end,
+    waitForTime,
     driveTo,
     driveThrough,
     turnToPoint,
@@ -85,30 +91,45 @@ public:
 
   float heading = 0;
 
+  bool waitingForTimer = false;
+
   int addSystemCommands(int readPosition, std::vector<int> &commands)
   {
     int numberOfCommands = 0;
     switch (commands[readPosition])
     {
-    case driveTo:
 
+    case waitFor:
+      numberOfCommands = 0;
+      systemCommands.push_back(commands[readPosition]);
+      systemCommands.push_back(commands[readPosition] + 1);
+      systemCommands.push_back(systemsArray[commands[readPosition + 1]]->systemCommands.size());
+      readPosition += 3;
+      break;
+    case maxTime:
+      numberOfCommands = 2;
+      break;
+    case end:
+      numberOfCommands = 2;
+      break;
+    case waitForTime:
+      numberOfCommands = 2;
+      break;
+    case driveTo:
       numberOfCommands = 3;
       break;
-
     case driveThrough:
       numberOfCommands = 3;
       break;
-
     case turnToPoint:
       numberOfCommands = 3;
       break;
-
     case turnToAngle:
       numberOfCommands = 2;
       break;
-
     default:
-
+      numberOfCommands = 0;
+      readPosition++;
       break;
     }
     for (int i = 0; i < numberOfCommands; i++)
@@ -121,62 +142,104 @@ public:
 
   bool updateSystem()
   {
-    if (systemDone)
+    if (systemReadPos < systemCommands.size())
     {
-      systemTimer.zeroTimer();
-      drivePIDTimer.stopTimer();
-      drivePIDTimer.zeroTimer();
-
-      driveTurnPID.resetPID();
-      distancePID.resetPID();
-      turnPID.resetPID();
-
-      driveTurnPID.setPIDTarget(0);
-      distancePID.setPIDTarget(0);
-      turnPID.setPIDTarget(0);
-
-      systemMaxTime = 0;
-      systemDone = false;
-
       switch (systemCommands[systemReadPos])
       {
-      case driveTo:
-        systemReadPos++;
-        targetX = systemCommands[systemReadPos];
-        systemReadPos++;
-        targetY = systemCommands[systemReadPos];
+      case waitFor:
+      {
+        if ((systemsArray[systemCommands[systemReadPos + 1]]->systemReadPos > systemCommands[systemReadPos] + 2) && systemsArray[systemCommands[systemReadPos + 1]]->systemDone)
+        {
+          systemReadPos += 3;
+        }
+      }
+      break;
+      case maxTime:
+        systemMaxTime = systemCommands[systemReadPos + 1];
+        systemReadPos += 2;
+        break;
+      case end:
+        systemDone = true;
         systemReadPos++;
         break;
-
-      case driveThrough:
-        systemReadPos++;
-        targetX = systemCommands[systemReadPos];
-        systemReadPos++;
-        targetY = systemCommands[systemReadPos];
-        systemReadPos++;
+      case waitForTime:
+        if (systemDone)
+        {
+          if (systemMaxTime = 0)
+          {
+            systemTimer.zeroTimer();
+            systemTimer.startTimer();
+            systemMaxTime = systemCommands[systemReadPos + 1];
+          }
+          else if (systemTimer.currentTime() >= systemMaxTime)
+          {
+            systemReadPos += 2;
+          }
+        }
         break;
-
-      case turnToPoint:
-        systemReadPos++;
-        targetX = systemCommands[systemReadPos];
-        systemReadPos++;
-        targetY = systemCommands[systemReadPos];
-        systemReadPos++;
-        break;
-
-      case turnToAngle:
-        systemReadPos++;
-        targetAngle = systemCommands[systemReadPos];
-        systemReadPos++;
-        break;
-
       default:
-        systemReadPos++;
+        if (systemDone)
+        {
+          systemTimer.zeroTimer();
+          drivePIDTimer.stopTimer();
+          drivePIDTimer.zeroTimer();
+
+          driveTurnPID.resetPID();
+          distancePID.resetPID();
+          turnPID.resetPID();
+
+          driveTurnPID.setPIDTarget(0);
+          distancePID.setPIDTarget(0);
+          turnPID.setPIDTarget(0);
+
+          systemTimer.stopTimer();
+          systemTimer.zeroTimer();
+
+          systemMaxTime = 0;
+          systemDone = false;
+
+          switch (systemCommands[systemReadPos])
+          {
+          case driveTo:
+            systemReadPos++;
+            targetX = systemCommands[systemReadPos];
+            systemReadPos++;
+            targetY = systemCommands[systemReadPos];
+            systemReadPos++;
+            break;
+
+          case driveThrough:
+            systemReadPos++;
+            targetX = systemCommands[systemReadPos];
+            systemReadPos++;
+            targetY = systemCommands[systemReadPos];
+            systemReadPos++;
+            break;
+
+          case turnToPoint:
+            systemReadPos++;
+            targetX = systemCommands[systemReadPos];
+            systemReadPos++;
+            targetY = systemCommands[systemReadPos];
+            systemReadPos++;
+            break;
+
+          case turnToAngle:
+            systemReadPos++;
+            targetAngle = systemCommands[systemReadPos];
+            systemReadPos++;
+            break;
+
+          default:
+            systemReadPos++;
+            break;
+          }
+        }
         break;
       }
     }
     executeSystemFunction();
-    if (systemReadPos >= systemCommands.size())
+    if (systemReadPos >= systemCommands.size() && systemDone)
     {
       systemCompleted = true;
     }
@@ -372,6 +435,8 @@ public:
 
   void executeSystemFunction()
   {
+    if (systemTimer.currentTime() != 0 && systemTimer.currentTime() >= systemMaxTime)
+      systemDone = true;
     if (!this->systemDone) // if the drive is not done
     {
       switch (driveCommand)
@@ -452,6 +517,10 @@ public:
 
       moveStraightDrive(leftSpeed, rightSpeed);
     }
+    else
+    {
+      moveStraightDrive(0, 0);
+    }
   }
 
   float currentAngle = 0;
@@ -498,13 +567,13 @@ public:
 
   void trackVelocity()
   {
-      angleVelocity = ((currentAngle - previousAngle) * 1000) / previousVelocityCheck;
-      xVelocity = ((currentX - previousX) * 1000) / previousVelocityCheck;
-      yVelocity = ((currentY - previousY) * 1000) / previousVelocityCheck;
+    angleVelocity = ((currentAngle - previousAngle) * 1000) / previousVelocityCheck;
+    xVelocity = ((currentX - previousX) * 1000) / previousVelocityCheck;
+    yVelocity = ((currentY - previousY) * 1000) / previousVelocityCheck;
 
-      previousAngle = currentAngle;
-      previousX = currentX;
-      previousY = currentY;
+    previousAngle = currentAngle;
+    previousX = currentX;
+    previousY = currentY;
   }
 
   void trackPosition()

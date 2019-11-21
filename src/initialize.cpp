@@ -7,6 +7,13 @@
 #include "headers/autonomous.h"
 #include "headers/opcontrol.h"
 
+/**
+ * Runs initialization code. This occurs as soon as the program is started.
+ *
+ * All other competition modes are blocked by initialize; it is recommended
+ * to keep execution time for this mode under a few seconds.
+ */
+
 driveMotor motorOne(FIRSTPORT);
 driveMotor motorTwo(SECONDPORT);
 driveMotor motorThree(THIRDPORT);
@@ -23,7 +30,7 @@ robotDrive mainDrive;
 pros::ADIGyro driveGyro(1);
 
 robotFunction autonRobotFunction;
-systems *systemsArray[NUMBER_OF_SYSTEMS];
+systems *systemsArray[NUMBER_OF_SYSTEMS] = {};
 
 #include "userIncludes/taskFunctions.cpp"
 
@@ -35,13 +42,6 @@ pros::Task mainDrivePositionTrackerTask(mainDrivePositionTrackerFn, (void *)"PRO
 #include "userIncludes/gyroFunctions.cpp"
 #include "userIncludes/lcdCode.cpp"
 #include "userIncludes/mathFunctions.cpp"
-
-/**
- * Runs initialization code. This occurs as soon as the program is started.
- *
- * All other competition modes are blocked by initialize; it is recommended
- * to keep execution time for this mode under a few seconds.
- */
 
 void initialize()
 {
@@ -84,7 +84,9 @@ void initialize()
   mainDrive.addRightMotor(&driveMotors[BACKRIGHTDRIVE]);
 
   mainDrive.addGyro(&driveGyro);
-  systemsArray[0] = &mainDrive;
+  systemsArray[base] = &mainDrive;
+
+  autonRobotFunction = robotFunction();
 }
 
 /**

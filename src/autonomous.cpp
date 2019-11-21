@@ -2,6 +2,7 @@
 #include "headers/autons.h"
 #include "headers/lcdCode.h"
 #include "headers/initialize.h"
+#include "headers/robotFunction.h"
 /**
 * Runs the user autonomous code. This function will be started in its own task
 * with the default priority and stack size whenever the robot is enabled via
@@ -19,7 +20,6 @@ int autonomousMode = DEFAULT_AUTONOMOUS_MODE;
 
 void autonomous()
 {
-  autonRobotFunction.addSystemArray(systemsArray);
   autonRobotFunction.resetRobotFunction();
 
   while (!autonomousSelected)

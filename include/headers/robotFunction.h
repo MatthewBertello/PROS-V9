@@ -9,6 +9,8 @@
 #include "headers/systems.h"
 #include "pros/rtos.hpp"
 
+extern systems *systemsArray[NUMBER_OF_SYSTEMS];
+
 class robotFunction
 {
 
@@ -19,25 +21,15 @@ public:
 
 	std::vector<int> robotFunctionCommands;
 
-	systems *allSystems[NUMBER_OF_SYSTEMS] = {};
-
-	void addSystemArray(systems *allSystems[])
-	{
-		for (int i = 0; i < NUMBER_OF_SYSTEMS; i++)
-		{
-			this->allSystems[i] = allSystems[i];
-		}
-	}
-
 	void resetRobotFunction()
 	{
 		finished = true;
 		robotFunctionCommands.clear();
 		for (int i = 0; i < NUMBER_OF_SYSTEMS; i++)
 		{
-			if (allSystems[i] != nullptr)
+			if (systemsArray[i] != nullptr)
 			{
-				allSystems[i]->resetSystemCommads();
+				systemsArray[i]->resetSystemCommads();
 			}
 		}
 	}
@@ -48,7 +40,7 @@ public:
 		robotFunctionCommands = {args...};
 		for (int i = 0; i < robotFunctionCommands.size(); i++)
 		{
-			i = allSystems[robotFunctionCommands[i]]->addSystemCommands(i + 1, robotFunctionCommands);
+			i = systemsArray[robotFunctionCommands[i]]->addSystemCommands(i + 1, robotFunctionCommands);
 		}
 		executeRobotFunction();
 	}
@@ -60,9 +52,9 @@ public:
 			finished = true;
 			for (int i = 0; i < NUMBER_OF_SYSTEMS; i++)
 			{
-				if (allSystems[i] != nullptr)
+				if (systemsArray[i] != nullptr)
 				{
-					if (!allSystems[i]->updateSystem())
+					if (!systemsArray[i]->updateSystem())
 						finished = false;
 				}
 			}
