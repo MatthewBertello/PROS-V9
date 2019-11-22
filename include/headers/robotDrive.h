@@ -160,6 +160,7 @@ public:
         break;
       case end:
         systemDone = true;
+        systemMaxTime = 0;
         systemReadPos++;
         break;
       case waitForTime:
@@ -244,6 +245,100 @@ public:
       systemCompleted = true;
     }
     return systemCompleted;
+  }
+
+  void executeSystemFunction()
+  {
+    if (systemTimer.currentTime() != 0 && systemTimer.currentTime() >= systemMaxTime)
+    {
+      systemMaxTime = 0;
+      systemDone = true;
+    }
+    if (!this->systemDone) // if the drive is not done
+    {
+      switch (driveCommand)
+      {
+      case driveTo:
+
+        deltaX = targetX - currentX;
+        deltaY = targetY - currentY;
+        direction = atan(deltaY / deltaX);
+        distance = sqrt(pow(deltaX, 2) + pow(deltaY, 2));
+
+        leftSpeed = rightSpeed = distancePID.calculatePID(distance);
+        leftSpeed += (fabs(leftSpeed) * driveTurnPID.calculatePID(direction - getCurrentAngle()));
+        rightSpeed -= (fabs(rightSpeed) * driveTurnPID.calculatePID(direction - getCurrentAngle()));
+
+        if (distance <= distanceThreshold)
+        {
+          drivePIDTimer.startTimer();
+        }
+        if (drivePIDTimer.currentTime() > 300)
+          this->systemDone = true;
+        break;
+
+      case driveThrough:
+
+        deltaX = targetX - currentX;
+        deltaY = targetY - currentY;
+        direction = atan(deltaY / deltaX);
+        distance = sqrt(pow(deltaX, 2) + pow(deltaY, 2));
+
+        leftSpeed = rightSpeed = 127;
+
+        leftSpeed += (fabs(leftSpeed) * driveTurnPID.calculatePID(direction - getCurrentAngle()));
+        rightSpeed -= (fabs(rightSpeed) * driveTurnPID.calculatePID(direction - getCurrentAngle()));
+
+        if (distance <= distanceThreshold)
+        {
+          drivePIDTimer.startTimer();
+        }
+        if (drivePIDTimer.currentTime() > 300)
+          this->systemDone = true;
+        break;
+
+      case turnToPoint:
+        deltaX = targetX - currentX;
+        deltaY = targetY - currentY;
+        direction = atan(deltaY / deltaX);
+
+        leftSpeed = turnPID.calculatePID(direction - getCurrentAngle());
+        rightSpeed = -leftSpeed;
+
+        if (direction - getCurrentAngle() <= angleThreshold)
+        {
+          drivePIDTimer.startTimer();
+        }
+        if (drivePIDTimer.currentTime() > 300)
+          this->systemDone = true;
+        break;
+
+      case turnToAngle:
+        direction = targetAngle;
+
+        leftSpeed = turnPID.calculatePID(direction - getCurrentAngle());
+        rightSpeed = -leftSpeed;
+
+        if (direction - getCurrentAngle() <= angleThreshold)
+        {
+          drivePIDTimer.startTimer();
+        }
+        if (drivePIDTimer.currentTime() > 300)
+          this->systemDone = true;
+        break;
+
+      default:
+        leftSpeed = 0;
+        rightSpeed = 0;
+      }
+
+      moveStraightDrive(leftSpeed, rightSpeed);
+    }
+    else
+    {
+      systemMaxTime = 0;
+      moveStraightDrive(0, 0);
+    }
   }
 
   void setDriveType(driveLayouts driveType)
@@ -430,96 +525,6 @@ public:
       {
         rightMotors[i]->setRequestedSpeed(right);
       }
-    }
-  }
-
-  void executeSystemFunction()
-  {
-    if (systemTimer.currentTime() != 0 && systemTimer.currentTime() >= systemMaxTime)
-      systemDone = true;
-    if (!this->systemDone) // if the drive is not done
-    {
-      switch (driveCommand)
-      {
-      case driveTo:
-
-        deltaX = targetX - currentX;
-        deltaY = targetY - currentY;
-        direction = atan(deltaY / deltaX);
-        distance = sqrt(pow(deltaX, 2) + pow(deltaY, 2));
-
-        leftSpeed = rightSpeed = distancePID.calculatePID(distance);
-        leftSpeed += (fabs(leftSpeed) * driveTurnPID.calculatePID(direction - getCurrentAngle()));
-        rightSpeed -= (fabs(rightSpeed) * driveTurnPID.calculatePID(direction - getCurrentAngle()));
-
-        if (distance <= distanceThreshold)
-        {
-          drivePIDTimer.startTimer();
-        }
-        if (drivePIDTimer.currentTime() > 300)
-          this->systemDone = true;
-        break;
-
-      case driveThrough:
-
-        deltaX = targetX - currentX;
-        deltaY = targetY - currentY;
-        direction = atan(deltaY / deltaX);
-        distance = sqrt(pow(deltaX, 2) + pow(deltaY, 2));
-
-        leftSpeed = rightSpeed = 127;
-
-        leftSpeed += (fabs(leftSpeed) * driveTurnPID.calculatePID(direction - getCurrentAngle()));
-        rightSpeed -= (fabs(rightSpeed) * driveTurnPID.calculatePID(direction - getCurrentAngle()));
-
-        if (distance <= distanceThreshold)
-        {
-          drivePIDTimer.startTimer();
-        }
-        if (drivePIDTimer.currentTime() > 300)
-          this->systemDone = true;
-        break;
-
-      case turnToPoint:
-        deltaX = targetX - currentX;
-        deltaY = targetY - currentY;
-        direction = atan(deltaY / deltaX);
-
-        leftSpeed = turnPID.calculatePID(direction - getCurrentAngle());
-        rightSpeed = -leftSpeed;
-
-        if (direction - getCurrentAngle() <= angleThreshold)
-        {
-          drivePIDTimer.startTimer();
-        }
-        if (drivePIDTimer.currentTime() > 300)
-          this->systemDone = true;
-        break;
-
-      case turnToAngle:
-        direction = targetAngle;
-
-        leftSpeed = turnPID.calculatePID(direction - getCurrentAngle());
-        rightSpeed = -leftSpeed;
-
-        if (direction - getCurrentAngle() <= angleThreshold)
-        {
-          drivePIDTimer.startTimer();
-        }
-        if (drivePIDTimer.currentTime() > 300)
-          this->systemDone = true;
-        break;
-
-      default:
-        leftSpeed = 0;
-        rightSpeed = 0;
-      }
-
-      moveStraightDrive(leftSpeed, rightSpeed);
-    }
-    else
-    {
-      moveStraightDrive(0, 0);
     }
   }
 
