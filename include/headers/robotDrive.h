@@ -441,17 +441,17 @@ public:
   }
   float getAbsoluteRightDriveSensor()
   {
-    if (rightEncoder != nullptr)
-    {
+    // if (rightEncoder != nullptr)
+    // {
       return rightEncoder->get_value();
-    }
-    else
-    {
-      if (rightMotors[0] != nullptr)
-        return rightMotors[0]->get_position();
-      else
-        return 0;
-    }
+    // }
+    // else
+    // {
+    //   if (rightMotors[0] != nullptr)
+    //     return rightMotors[0]->get_position();
+    //   else
+    //     return 0;
+    // }
   }
   float getAbsoluteStrafeDriveSensor()
   {
@@ -483,17 +483,17 @@ public:
   }
   float getRightDriveSensor()
   {
-    if (rightEncoder != nullptr)
-    {
+    // if (rightEncoder != nullptr)
+    // {
       return rightEncoder->get_value() - rightDriveSensorLastReset;
-    }
-    else
-    {
-      if (leftMotors[0] != nullptr)
-        return rightMotors[0]->get_position() - rightDriveSensorLastReset;
-      else
-        return 0;
-    }
+    // }
+    // else
+    // {
+    //   if (leftMotors[0] != nullptr)
+    //     return rightMotors[0]->get_position() - rightDriveSensorLastReset;
+    //   else
+    //     return 0;
+    // }
   }
   float getStrafeDriveSensor()
   {

@@ -40,7 +40,7 @@ void opcontrol()
     pros::lcd::print(1, "Y =  %d", mainDrive.currentY);
     pros::lcd::print(2, "A =  %d", mainDrive.currentAngle);
     pros::lcd::print(3, "Left =  %d", leftEncoder.get_value());
-    pros::lcd::print(4, "Right =  %d", rightEncoder.get_value());
+    pros::lcd::print(4, "Right =  %d", mainDrive.getAbsoluteRightDriveSensor());
     pros::lcd::print(5, "Strafe =  %d", strafeEncoder.get_value());
     // autonomousSelection();
 

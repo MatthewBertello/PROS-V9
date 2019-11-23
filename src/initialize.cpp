@@ -29,8 +29,8 @@ robotDrive mainDrive;
 
 pros::ADIGyro driveGyro(1);
 
-pros::ADIEncoder leftEncoder(7, 8, false);
-pros::ADIEncoder rightEncoder(5, 6, true);
+pros::ADIEncoder leftEncoder(7, 8, true);
+pros::ADIEncoder rightEncoder(5, 6, false);
 pros::ADIEncoder strafeEncoder(3, 4, true);
 
 robotFunction autonRobotFunction;
