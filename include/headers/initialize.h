@@ -17,6 +17,10 @@ extern driveMotor motorSix;
 extern driveMotor motorSeven;
 extern driveMotor motorEight;
 
+extern pros::ADIEncoder leftEncoder;
+extern pros::ADIEncoder rightEncoder;
+extern pros::ADIEncoder strafeEncoder;
+
 extern driveMotor driveMotors[TOTAL_MOTORS];
 
 

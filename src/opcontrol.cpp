@@ -27,21 +27,21 @@ pros::Controller partner(pros::E_CONTROLLER_PARTNER);
 void opcontrol()
 {
   uint32_t lastRun = pros::c::millis();
-  pros::lcd::print(0, "X =  %d", mainDrive.currentX);
-  pros::lcd::print(1, "Y =  %d", mainDrive.currentY);
-  pros::lcd::print(2, "A =  %d", mainDrive.currentAngle);
-  pros::lcd::print(3, "Left =  %d", mainDrive.getLeftDriveSensor());
-  pros::lcd::print(4, "Right =  %d", mainDrive.getRightDriveSensor());
-  pros::lcd::print(5, "Strafe =  %d", mainDrive.getStrafeDriveSensor());
+  // pros::lcd::print(0, "X =  %d", mainDrive.currentX);
+  // pros::lcd::print(1, "Y =  %d", mainDrive.currentY);
+  // pros::lcd::print(2, "A =  %d", mainDrive.currentAngle);
+  // pros::lcd::print(3, "Left =  %d", mainDrive.getLeftDriveSensor());
+  // pros::lcd::print(4, "Right =  %d", mainDrive.getRightDriveSensor());
+  // pros::lcd::print(5, "Strafe =  %d", mainDrive.getStrafeDriveSensor());
 
   while (true) // infinite while loop
   {
     pros::lcd::print(0, "X =  %d", mainDrive.currentX);
     pros::lcd::print(1, "Y =  %d", mainDrive.currentY);
     pros::lcd::print(2, "A =  %d", mainDrive.currentAngle);
-    pros::lcd::print(3, "Left =  %d", mainDrive.getLeftDriveSensor());
-    pros::lcd::print(4, "Right =  %d", mainDrive.getRightDriveSensor());
-    pros::lcd::print(5, "Strafe =  %d", mainDrive.getStrafeDriveSensor());
+    pros::lcd::print(3, "Left =  %d", leftEncoder.get_value());
+    pros::lcd::print(4, "Right =  %d", rightEncoder.get_value());
+    pros::lcd::print(5, "Strafe =  %d", strafeEncoder.get_value());
     // autonomousSelection();
 
     if (partner.is_connected()) // if their are two controllers
