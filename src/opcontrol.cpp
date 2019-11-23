@@ -31,8 +31,8 @@ void opcontrol()
   pros::lcd::print(1, "Y =  %d", mainDrive.currentY);
   pros::lcd::print(2, "A =  %d", mainDrive.currentAngle);
   pros::lcd::print(3, "Left =  %d", mainDrive.getLeftDriveSensor());
-  pros::lcd::print(4, "Right =  %d", mainDrive.getLeftDriveSensor());
-  pros::lcd::print(5, "Strafe =  %d", mainDrive.getLeftDriveSensor());
+  pros::lcd::print(4, "Right =  %d", mainDrive.getRightDriveSensor());
+  pros::lcd::print(5, "Strafe =  %d", mainDrive.getStrafeDriveSensor());
 
   while (true) // infinite while loop
   {
@@ -40,8 +40,8 @@ void opcontrol()
     pros::lcd::print(1, "Y =  %d", mainDrive.currentY);
     pros::lcd::print(2, "A =  %d", mainDrive.currentAngle);
     pros::lcd::print(3, "Left =  %d", mainDrive.getLeftDriveSensor());
-    pros::lcd::print(4, "Right =  %d", mainDrive.getLeftDriveSensor());
-    pros::lcd::print(5, "Strafe =  %d", mainDrive.getLeftDriveSensor());
+    pros::lcd::print(4, "Right =  %d", mainDrive.getRightDriveSensor());
+    pros::lcd::print(5, "Strafe =  %d", mainDrive.getStrafeDriveSensor());
     // autonomousSelection();
 
     if (partner.is_connected()) // if their are two controllers
