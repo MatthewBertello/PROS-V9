@@ -585,7 +585,8 @@ public:
   {
     float left = getAbsoluteLeftDriveSensor();
     float right = getAbsoluteRightDriveSensor();
-    float strafe = getAbsoluteStrafeDriveSensor();
+    // float strafe = getAbsoluteStrafeDriveSensor();
+    float strafe = 0;
 
     float leftWheelDistance = getwheelDistanceMoved(left - previousLeft, leftWheelDiameter, leftTicksPerRotation);
     float rightWheelDistance = getwheelDistanceMoved(right - previousRight, rightWheelDiameter, rightTicksPerRotation);
