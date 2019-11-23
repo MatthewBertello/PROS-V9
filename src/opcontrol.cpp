@@ -3,6 +3,7 @@
 #include "headers/initialize.h"
 #include "headers/lcdCode.h"
 #include "headers/robotDrive.h"
+#include "headers/taskFunctions.h"
 
 /**
 * Runs the operator control code. This function will be started in its own task
@@ -26,23 +27,37 @@ pros::Controller partner(pros::E_CONTROLLER_PARTNER);
 
 void opcontrol()
 {
+  // pros::Task mainDrivePositionTrackerTask(mainDrivePositionTrackerFn, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "mainDrivePositionTrackerTask");
+
   uint32_t lastRun = pros::c::millis();
-  pros::lcd::print(0, "X =  %d", mainDrive.currentX);
-  pros::lcd::print(1, "Y =  %d", mainDrive.currentY);
-  pros::lcd::print(2, "A =  %d", mainDrive.currentAngle);
-  pros::lcd::print(3, "Left =  %d", mainDrive.getLeftDriveSensor());
-  pros::lcd::print(4, "Right =  %d", mainDrive.getLeftDriveSensor());
-  pros::lcd::print(5, "Strafe =  %d", mainDrive.getLeftDriveSensor());
+  // pros::lcd::print(0, "X =  %d", mainDrive.currentX);
+  // pros::lcd::print(1, "Y =  %d", mainDrive.currentY);
+  // pros::lcd::print(2, "A =  %d", mainDrive.currentAngle);
+  // pros::lcd::print(3, "Left =  %d", mainDrive.getLeftDriveSensor());
+  // pros::lcd::print(4, "Right =  %d", mainDrive.getLeftDriveSensor());
+  // pros::lcd::print(5, "Strafe =  %d", mainDrive.getLeftDriveSensor());
 
   while (true) // infinite while loop
   {
-    pros::lcd::print(0, "X =  %d", mainDrive.currentX);
-    pros::lcd::print(1, "Y =  %d", mainDrive.currentY);
-    pros::lcd::print(2, "A =  %d", mainDrive.currentAngle);
-    pros::lcd::print(3, "Left =  %d", mainDrive.getLeftDriveSensor());
-    pros::lcd::print(4, "Right =  %d", mainDrive.getLeftDriveSensor());
-    pros::lcd::print(5, "Strafe =  %d", mainDrive.getLeftDriveSensor());
+    // if(master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) > 0)
+    // {
+    mainDrive.leftF = rightEncoder2.get_value();
+    // }
+    mainDrive.trackPosition();
+    int thx = mainDrive.currentX;
+    int thy = mainDrive.currentY;
+    int tha = mainDrive.getAngleAsGyro();
+    int thrwd = mainDrive.rightWheelDistance;
+    int thrw = mainDrive.angleChange;
+    pros::lcd::print(0, "X =  %d", thx);
+    pros::lcd::print(1, "Y =  %d",thy);
+    pros::lcd::print(2, "A =  %d", tha);
+    pros::lcd::print(3, "left =  %d", mainDrive.leftF);
+    pros::lcd::print(4, "Rightd =  %d", rightEncoder2.get_value());
+    // pros::lcd::print(5, "angc =  %d", thrw);
+    // pros::lcd::print(5, "Strafe =  %d", mainDrive.getLeftDriveSensor());
     // autonomousSelection();
+    
 
     if (partner.is_connected()) // if their are two controllers
     {
@@ -52,7 +67,7 @@ void opcontrol()
     {
       singleControllerDrive(); // use the one controller drive code
     }
-    pros::c::task_delay_until(&lastRun, OP_CONTROL_REFRESH_RATE);
+    pros::c::task_delay_until(&lastRun, 500);
     lastRun = pros::c::millis();
   }
 }
@@ -64,7 +79,7 @@ void doubleControllerDrive()
   float tempLeftIn;
   float tempRightIn;
 
-  leftIn = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+  leftIn = 0;
   rightIn = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
 
   if (control)

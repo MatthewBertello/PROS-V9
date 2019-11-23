@@ -29,9 +29,9 @@ robotDrive mainDrive;
 
 pros::ADIGyro driveGyro(1);
 
-pros::ADIEncoder leftEncoder(7, 8, false);
-pros::ADIEncoder rightEncoder(5, 6, true);
-pros::ADIEncoder strafeEncoder(3, 4, true);
+pros::ADIEncoder leftEncoder2(3, 4, true);
+pros::ADIEncoder rightEncoder2(5, 6, true);
+pros::ADIEncoder strafeEncoder2(1, 2, true);
 
 robotFunction autonRobotFunction;
 systems *systemsArray[NUMBER_OF_SYSTEMS] = {};
@@ -39,7 +39,7 @@ systems *systemsArray[NUMBER_OF_SYSTEMS] = {};
 #include "userIncludes/taskFunctions.cpp"
 
 pros::Task slewMotorsTask(slewMotors, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "slewMotorsTask");
-pros::Task mainDrivePositionTrackerTask(mainDrivePositionTrackerFn, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "mainDrivePositionTrackerTask");
+// pros::Task mainDrivePositionTrackerTask(mainDrivePositionTrackerFn, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "mainDrivePositionTrackerTask");
 
 #include "userIncludes/autons.cpp"
 #include "userIncludes/config.cpp"
@@ -51,14 +51,14 @@ void initialize()
 {
   pros::lcd::initialize();
 
-  driveMotors[0].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[1].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[2].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[3].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[4].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[5].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[6].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[7].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+  driveMotors[0].set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  driveMotors[1].set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  driveMotors[2].set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  driveMotors[3].set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  driveMotors[4].set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  driveMotors[5].set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  driveMotors[6].set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  driveMotors[7].set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 
   driveMotors[FRONTLEFTDRIVE].set_gearing(pros::E_MOTOR_GEARSET_18);
   driveMotors[FRONTRIGHTDRIVE].set_gearing(pros::E_MOTOR_GEARSET_18);
@@ -81,9 +81,9 @@ void initialize()
   mainDrive.addGyro(&driveGyro);
   systemsArray[base] = &mainDrive;
 
-  mainDrive.addLeftEncoder(&leftEncoder);
-  mainDrive.addRightEncoder(&rightEncoder);
-  mainDrive.addStrafeEncoder(&strafeEncoder);
+  // mainDrive.addLeftEncoder(&leftEncoder);
+  // mainDrive.addRightEncoder(&rightEncoder);
+  // mainDrive.addStrafeEncoder(&strafeEncoder);
 
   autonRobotFunction = robotFunction();
 }

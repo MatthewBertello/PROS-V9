@@ -61,7 +61,7 @@ const bool DEFAULT_AUTONOMOUS_MODE = 1;
 const int SLEW_REFRESH_RATE = 10;
 const int MAX_MOTOR_SPEED = 127;
 const int MIN_MOTOR_SPEED = -127;
-const int DRIVE_TRACKER_REFRESH_RATE = 1;
+const int DRIVE_TRACKER_REFRESH_RATE = 5;
 
 //opControl.cpp
 const int OP_CONTROL_REFRESH_RATE = 5;

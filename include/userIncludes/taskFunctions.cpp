@@ -51,13 +51,13 @@ void slewMotors(void *param)
 
 void mainDrivePositionTrackerFn(void *param)
 {
-  uint32_t lastRun = pros::c::millis();
-  while (true)
-  {
-    lastRun = pros::c::millis();
-    mainDrive.trackPosition();
-    mainDrive.trackVelocity();
-    pros::c::task_delay_until(&lastRun, DRIVE_TRACKER_REFRESH_RATE);
-  }
+  // uint32_t lastRun = pros::c::millis();
+  // while (true)
+  // {
+  //   lastRun = pros::c::millis();
+  //   mainDrive.trackPosition();
+  //   mainDrive.trackVelocity();
+  //   pros::c::task_delay_until(&lastRun, DRIVE_TRACKER_REFRESH_RATE);
+  // }
 }
 #endif

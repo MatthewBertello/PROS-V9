@@ -14,6 +14,10 @@
 
 extern systems *systemsArray[NUMBER_OF_SYSTEMS];
 
+extern pros::ADIEncoder leftEncoder2;
+extern pros::ADIEncoder rightEncoder2;
+extern pros::ADIEncoder strafeEncoder2;
+
 class robotDrive : public systems
 {
 
@@ -545,9 +549,9 @@ public:
 
   uint32_t previousVelocityCheck = pros::c::millis();
 
-  float getwheelDistanceMoved(float rotationsMoved, float wheelDiameter, float ticksPerRotation)
+  float getwheelDistanceMoved(float ticksMoved, float wheelDiameter, float ticksPerRotation)
   {
-    return wheelDiameter * PI / ticksPerRotation;
+    return (ticksMoved / ticksPerRotation) * (wheelDiameter * PI);
   }
 
   int getAngleAsGyro()
@@ -580,15 +584,17 @@ public:
     previousX = currentX;
     previousY = currentY;
   }
-
+  float rightWheelDistance;
+  float angleChange;
+  int leftF = 0;
   void trackPosition()
   {
-    float left = getAbsoluteLeftDriveSensor();
-    float right = getAbsoluteRightDriveSensor();
-    float strafe = getAbsoluteStrafeDriveSensor();
+    float left = leftF;
+    float right = rightEncoder2.get_value();
+    float strafe = 0;
 
     float leftWheelDistance = getwheelDistanceMoved(left - previousLeft, leftWheelDiameter, leftTicksPerRotation);
-    float rightWheelDistance = getwheelDistanceMoved(right - previousRight, rightWheelDiameter, rightTicksPerRotation);
+    rightWheelDistance = getwheelDistanceMoved(right - previousRight, rightWheelDiameter, rightTicksPerRotation);
     float strafeWheelDistance = getwheelDistanceMoved(strafe - previousStrafe, strafeWheelDiameter, strafeTicksPerRotation);
 
     previousLeft = left;
@@ -601,7 +607,7 @@ public:
       return;
     }
 
-    float angleChange = (leftWheelDistance - rightWheelDistance) / (leftDistanceFromCenter + rightDistanceFromCenter);
+    angleChange = (leftWheelDistance - rightWheelDistance) / (leftDistanceFromCenter + rightDistanceFromCenter);
 
     float distanceTraveled;
     float distanceTraveledStrafe;
