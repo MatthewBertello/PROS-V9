@@ -545,9 +545,9 @@ public:
 
   uint32_t previousVelocityCheck = pros::c::millis();
 
-  float getwheelDistanceMoved(float rotationsMoved, float wheelDiameter, float ticksPerRotation)
+  float getwheelDistanceMoved(float ticksMoved, float wheelDiameter, float ticksPerRotation)
   {
-    return wheelDiameter * PI / ticksPerRotation;
+    return (ticksMoved / ticksPerRotation) * (wheelDiameter * PI);
   }
 
   int getAngleAsGyro()
