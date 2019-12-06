@@ -38,7 +38,7 @@ extern const int MEDIAN_FILTER_DEFAULT_WIDTH;
 #define MEDIAN_FILTER_MAX_VALUES 100
 
 //initialize.h
-#define NUMBER_OF_SYSTEMS 10
+#define NUMBER_OF_SYSTEMS 1
 #define TOTAL_MOTORS 8
 
 //pidController.h

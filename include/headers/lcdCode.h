@@ -11,6 +11,7 @@ void decreaseAutonomousMode();
 void selectAutonomous();
 void increaseAutonomousMode();
 void unselectAutonomous();
+void clearLines();
 
 
 #endif

@@ -10,7 +10,7 @@ class systems
 
 public:
 
-  bool systemDone;
+  bool systemDone = true;
   bool systemCompleted;
   timer systemTimer = timer();
   int systemMaxTime = 0;

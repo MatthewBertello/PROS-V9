@@ -1,5 +1,7 @@
 #include "main.h"
 
+#include "userIncludes/globals.cpp"
+
 #include "headers/config.h"
 #include "headers/driveMotor.h"
 #include "headers/robotDrive.h"
@@ -50,15 +52,16 @@ pros::Task mainDrivePositionTrackerTask(mainDrivePositionTrackerFn, (void *)"PRO
 void initialize()
 {
   pros::lcd::initialize();
+  
 
-  driveMotors[0].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[1].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[2].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[3].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[4].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[5].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[6].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  driveMotors[7].set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+  driveMotors[0].set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  driveMotors[1].set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  driveMotors[2].set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  driveMotors[3].set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  driveMotors[4].set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  driveMotors[5].set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  driveMotors[6].set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  driveMotors[7].set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 
   driveMotors[FRONTLEFTDRIVE].set_gearing(pros::E_MOTOR_GEARSET_18);
   driveMotors[FRONTRIGHTDRIVE].set_gearing(pros::E_MOTOR_GEARSET_18);
@@ -85,6 +88,8 @@ void initialize()
   mainDrive.addRightEncoder(&rightEncoder);
   mainDrive.addStrafeEncoder(&strafeEncoder);
 
+  mainDrive.strafeDistanceFromCenter = 0;
+
   autonRobotFunction = robotFunction();
 }
 
@@ -95,7 +100,8 @@ void initialize()
  */
 void disabled()
 {
-  pros::lcd::set_text(1, "Hello PROS User!d");
+  pros::lcd::clear();
+  pros::lcd::set_text(1, "Currently disabled");
 }
 
 /**

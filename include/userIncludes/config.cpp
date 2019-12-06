@@ -5,10 +5,10 @@
 
 #include "main.h"
 
-const int FIRSTPORT = 1;
-const int SECONDPORT = 2;
-const int THIRDPORT = 3;
-const int FOURTHPORT = 4;
+const int FIRSTPORT = 15;
+const int SECONDPORT = 4;
+const int THIRDPORT = 2;
+const int FOURTHPORT = 3;
 const int FIFTHPORT = 5;
 const int SIXTHPORT = 6;
 const int SEVENTHPORT = 7;
@@ -46,9 +46,9 @@ const bool DEFAULT_PID_CHANGE_CONSTANT_DIRECTION = true;
 
 //robotDrive.h
 const float ROBOT_DRIVE_DEFAULT_WHEEL_DIAMETER = 2.783;
-const float ROBOT_DRIVE_DEFAULT_WHEEL_DISTANCE_FROM_CENTER = 8;
+const float ROBOT_DRIVE_DEFAULT_WHEEL_DISTANCE_FROM_CENTER = 3.625;
 const float ROBOT_DRIVE_DEFAULT_WHEEL_TICKS_PER_ROTATION = 360;
-const float ROBOT_DRIVE_DEFAULT_DISTANCE_THRESHOLD = 25;
+const float ROBOT_DRIVE_DEFAULT_DISTANCE_THRESHOLD = .5;
 const float ROBOT_DRIVE_DEFAULT_ANGLE_THRESHOLD = 50;
 
 //lcdCode.cpp

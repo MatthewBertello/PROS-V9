@@ -36,7 +36,6 @@ void opcontrol()
     pros::lcd::print(3, "Left =  %f", mainDrive.getLeftDriveSensor());
     pros::lcd::print(4, "Right =  %f", mainDrive.getRightDriveSensor());
     pros::lcd::print(5, "Strafe =  %f", mainDrive.getStrafeDriveSensor());
-    // autonomousSelection();
 
     if (partner.is_connected()) // if their are two controllers
     {
