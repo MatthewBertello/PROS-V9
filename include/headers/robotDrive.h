@@ -48,7 +48,7 @@ public:
   pros::ADIEncoder *rightEncoder = nullptr;
   pros::ADIEncoder *strafeEncoder = nullptr;
 
-  PIDController distancePID = PIDController(.1, .05, .01, 5, 254, 0, 635, true, true);
+  PIDController distancePID = PIDController(12.7, .0, .0, 5, 0, 0, 635, true, true);
   PIDController turnPID = PIDController(.1, .025, .1, 10, 800, 0, 300, true, true);
   PIDController driveTurnPID = PIDController(.0025, .00, .0, 0, 1000, 0, 500, true, true);
 
@@ -142,8 +142,18 @@ public:
 
   bool updateSystem()
   {
+    pros::lcd::print(0, "X =  %f", currentX);
+    pros::lcd::print(1, "Y =  %f", currentY);
+    pros::lcd::print(2, "A =  %d", getAngleAsGyro());
+    pros::lcd::print(3, "Left =  %f", getLeftDriveSensor());
+    pros::lcd::print(4, "deltaA =  %f", gyroDirection(direction, getCurrentAngle()) * gyroDifference(direction, getCurrentAngle()));
+    pros::lcd::print(5, "Strafe =  %f", getStrafeDriveSensor());
+    pros::lcd::print(6, "Strafe =  %f", leftSpeed);
+    pros::lcd::print(7, "Strafe =  %f", rightSpeed);
+
     if (systemReadPos < systemCommands.size())
     {
+      pros::lcd::print(1, "case %d", systemCommands[systemReadPos]);
       switch (systemCommands[systemReadPos])
       {
       case waitFor:
@@ -202,6 +212,7 @@ public:
           switch (systemCommands[systemReadPos])
           {
           case driveTo:
+            driveCommand = driveTo;
             systemReadPos++;
             targetX = systemCommands[systemReadPos];
             systemReadPos++;
@@ -210,6 +221,7 @@ public:
             break;
 
           case driveThrough:
+            driveCommand = systemCommands[systemReadPos];
             systemReadPos++;
             targetX = systemCommands[systemReadPos];
             systemReadPos++;
@@ -218,6 +230,7 @@ public:
             break;
 
           case turnToPoint:
+            driveCommand = systemCommands[systemReadPos];
             systemReadPos++;
             targetX = systemCommands[systemReadPos];
             systemReadPos++;
@@ -226,6 +239,7 @@ public:
             break;
 
           case turnToAngle:
+            driveCommand = systemCommands[systemReadPos];
             systemReadPos++;
             targetAngle = systemCommands[systemReadPos];
             systemReadPos++;
@@ -236,6 +250,7 @@ public:
             break;
           }
         }
+
         break;
       }
     }
@@ -249,7 +264,7 @@ public:
 
   void executeSystemFunction()
   {
-    if (systemTimer.currentTime() != 0 && systemTimer.currentTime() >= systemMaxTime)
+    if (systemMaxTime != 0 && systemTimer.currentTime() >= systemMaxTime)
     {
       systemMaxTime = 0;
       systemDone = true;
@@ -265,16 +280,20 @@ public:
         direction = atan(deltaY / deltaX);
         distance = sqrt(pow(deltaX, 2) + pow(deltaY, 2));
 
-        leftSpeed = rightSpeed = distancePID.calculatePID(distance);
-        leftSpeed += (fabs(leftSpeed) * driveTurnPID.calculatePID(direction - getCurrentAngle()));
-        rightSpeed -= (fabs(rightSpeed) * driveTurnPID.calculatePID(direction - getCurrentAngle()));
+        leftSpeed = rightSpeed = distancePID.calculatePID(-distance);
+        leftSpeed += (fabs(leftSpeed) * driveTurnPID.calculatePID(gyroDirection(direction, getCurrentAngle()) * gyroDifference(direction, getCurrentAngle())));
+        rightSpeed -= (fabs(rightSpeed) * driveTurnPID.calculatePID(gyroDirection(direction, getCurrentAngle()) * gyroDifference(direction, getCurrentAngle())));
 
         if (distance <= distanceThreshold)
         {
           drivePIDTimer.startTimer();
         }
         if (drivePIDTimer.currentTime() > 300)
+        {
+          leftSpeed = 0;
+          rightSpeed = 0;
           this->systemDone = true;
+        }
         break;
 
       case driveThrough:
@@ -286,8 +305,8 @@ public:
 
         leftSpeed = rightSpeed = 127;
 
-        leftSpeed += (fabs(leftSpeed) * driveTurnPID.calculatePID(direction - getCurrentAngle()));
-        rightSpeed -= (fabs(rightSpeed) * driveTurnPID.calculatePID(direction - getCurrentAngle()));
+        leftSpeed += (fabs(leftSpeed) * driveTurnPID.calculatePID(gyroDirection(direction, getCurrentAngle()) * gyroDifference(direction, getCurrentAngle())));
+        rightSpeed -= (fabs(rightSpeed) * driveTurnPID.calculatePID(gyroDirection(direction, getCurrentAngle()) * gyroDifference(direction, getCurrentAngle())));
 
         if (distance <= distanceThreshold)
         {
@@ -302,7 +321,7 @@ public:
         deltaY = targetY - currentY;
         direction = atan(deltaY / deltaX);
 
-        leftSpeed = turnPID.calculatePID(direction - getCurrentAngle());
+        leftSpeed = turnPID.calculatePID(gyroDirection(direction, getCurrentAngle()) * gyroDifference(direction, getCurrentAngle()));
         rightSpeed = -leftSpeed;
 
         if (direction - getCurrentAngle() <= angleThreshold)
@@ -316,7 +335,7 @@ public:
       case turnToAngle:
         direction = targetAngle;
 
-        leftSpeed = turnPID.calculatePID(direction - getCurrentAngle());
+        leftSpeed = turnPID.calculatePID(gyroDirection(direction, getCurrentAngle()) * gyroDifference(direction, getCurrentAngle()));
         rightSpeed = -leftSpeed;
 
         if (direction - getCurrentAngle() <= angleThreshold)
@@ -331,7 +350,6 @@ public:
         leftSpeed = 0;
         rightSpeed = 0;
       }
-
       moveStraightDrive(leftSpeed, rightSpeed);
     }
     else
@@ -545,14 +563,14 @@ public:
 
   uint32_t previousVelocityCheck = pros::c::millis();
 
-  float getwheelDistanceMoved(float rotationsMoved, float wheelDiameter, float ticksPerRotation)
+  float getwheelDistanceMoved(float ticksMoved, float wheelDiameter, float ticksPerRotation)
   {
-    return wheelDiameter * PI / ticksPerRotation;
+    return (ticksMoved / ticksPerRotation) * (wheelDiameter * PI);
   }
 
   int getAngleAsGyro()
   {
-    return (int)((currentAngle * (180 / PI)) * 10);
+    return correctGyroValue(((currentAngle * (180 / PI)) * 10));
   }
 
   void setPosition(float x, float y, float angle)
@@ -628,8 +646,8 @@ public:
     currentY += distanceTraveled * cosAngleTraveled;
     currentX += distanceTraveled * sinAngleTraveled;
 
-    currentY += distanceTraveledStrafe * cosAngleTraveled;
-    currentX += distanceTraveledStrafe * sinAngleTraveled;
+    currentY += distanceTraveledStrafe * -sinAngleTraveled;
+    currentX += distanceTraveledStrafe * cosAngleTraveled;
 
     currentAngle += angleChange;
   }

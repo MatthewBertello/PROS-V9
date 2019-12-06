@@ -15,7 +15,6 @@ class robotFunction
 {
 
 public:
-
 	bool finished = true;
 	uint32_t lastRun = pros::c::millis();
 

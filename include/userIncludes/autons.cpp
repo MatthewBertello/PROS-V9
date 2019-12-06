@@ -8,8 +8,13 @@
 #include "headers/initialize.h"
 #include "headers/config.h"
 
+
 enum driveCommands
 {
+    waitFor,
+    maxTime,
+    end,
+    waitForTime,
     driveTo,
     driveThrough,
     turnToPoint,
@@ -32,6 +37,9 @@ void autonomous1()
     autonRobotFunction.addCommands(
         base, turnToAngle, 180
     );
+    // autonRobotFunction.addCommands(
+    // base, driveTo, 0, 10
+    // );
 }
 void autonomous2()
 {

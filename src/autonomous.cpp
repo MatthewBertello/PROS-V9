@@ -3,6 +3,7 @@
 #include "headers/lcdCode.h"
 #include "headers/initialize.h"
 #include "headers/robotFunction.h"
+#include "headers/globals.h"
 /**
 * Runs the user autonomous code. This function will be started in its own task
 * with the default priority and stack size whenever the robot is enabled via
@@ -15,9 +16,6 @@
 * from where it left off.
 */
 
-bool autonomousSelected = false;
-int autonomousMode = DEFAULT_AUTONOMOUS_MODE;
-
 void autonomous()
 {
   autonRobotFunction.resetRobotFunction();
@@ -27,6 +25,8 @@ void autonomous()
     autonomousSelection();
     pros::delay(10);
   }
+  clearLines();
+  pros::lcd::print(0, "Running autnonomous", 0);
   switch (autonomousMode) // switch to determine which auton to run
   {
   case 1:
