@@ -153,7 +153,6 @@ public:
 
     if (systemReadPos < systemCommands.size())
     {
-      pros::lcd::print(1, "case %d", systemCommands[systemReadPos]);
       switch (systemCommands[systemReadPos])
       {
       case waitFor:
