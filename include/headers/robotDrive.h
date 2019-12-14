@@ -22,7 +22,8 @@ public:
   {
     STRAIGHT_DRIVE,
     HOLONOMIC,
-    H_DRIVE
+    H_DRIVE,
+    TRIANGLE_DRIVE
   };
 
   enum driveCommands
@@ -41,6 +42,7 @@ public:
 
   driveMotor *leftMotors[TOTAL_MOTORS] = {};
   driveMotor *rightMotors[TOTAL_MOTORS] = {};
+  driveMotor *centerMotors[TOTAL_MOTORS] = {};
   driveMotor *strafeMotors[TOTAL_MOTORS] = {};
 
   pros::ADIGyro *driveGyro = nullptr;
@@ -349,12 +351,12 @@ public:
         leftSpeed = 0;
         rightSpeed = 0;
       }
-      moveStraightDrive(leftSpeed, rightSpeed);
+      moveDrive(leftSpeed, rightSpeed);
     }
     else
     {
       systemMaxTime = 0;
-      moveStraightDrive(0, 0);
+      moveDrive(0, 0);
     }
   }
 
@@ -394,7 +396,7 @@ public:
   }
   bool addLeftMotor(driveMotor *newMotor)
   {
-    for (int i = 0; i < 7; i++)
+    for (int i = 0; i < TOTAL_MOTORS; i++)
     {
       if (leftMotors[i] == nullptr)
       {
@@ -418,11 +420,23 @@ public:
   }
   bool addStrafeMotor(driveMotor *newMotor)
   {
-    for (int i = 0; i < 7; i++)
+    for (int i = 0; i < TOTAL_MOTORS; i++)
     {
-      if (leftMotors[i] == nullptr)
+      if (centerMotors[i] == nullptr)
       {
         strafeMotors[i] = newMotor;
+        return true;
+      }
+    }
+    return false;
+  }
+  bool addCenterMotor(driveMotor *newMotor)
+  {
+    for (int i = 0; i < TOTAL_MOTORS; i++)
+    {
+      if (centerMotors[i] == nullptr)
+      {
+        centerMotors[i] = newMotor;
         return true;
       }
     }
@@ -506,7 +520,7 @@ public:
     }
     else
     {
-      if (leftMotors[0] != nullptr)
+      if (rightMotors[0] != nullptr)
         return rightMotors[0]->get_position() - rightDriveSensorLastReset;
       else
         return 0;
@@ -520,27 +534,68 @@ public:
     }
     else
     {
-      if (leftMotors[0] != nullptr)
+      if (strafeMotors[0] != nullptr)
         return strafeMotors[0]->get_position() - strafeDriveSensorLastReset;
       else
         return 0;
     }
   }
 
+  void moveDrive(int left, int right)
+  {
+    switch (driveType)
+    {
+    case STRAIGHT_DRIVE:
+      moveStraightDrive(left, right);
+      break;
+    case TRIANGLE_DRIVE:
+      moveTriangleDrive(left, right);
+      break;
+    
+    default:
+      break;
+    }
+  }
+
   void moveStraightDrive(int left, int right)
   {
-    for (int i = 0; i < 7; i++)
+    for (int i = 0; i < TOTAL_MOTORS; i++)
     {
       if (leftMotors[i] != nullptr)
       {
         leftMotors[i]->setRequestedSpeed(left);
       }
     }
-    for (int i = 0; i < 7; i++)
+    for (int i = 0; i < TOTAL_MOTORS; i++)
     {
       if (rightMotors[i] != nullptr)
       {
         rightMotors[i]->setRequestedSpeed(right);
+      }
+    }
+  }
+
+  void moveTriangleDrive(int left, int right)
+  {
+    for (int i = 0; i < TOTAL_MOTORS; i++)
+    {
+      if (leftMotors[i] != nullptr)
+      {
+        leftMotors[i]->setRequestedSpeed(left);
+      }
+    }
+    for (int i = 0; i < TOTAL_MOTORS; i++)
+    {
+      if (rightMotors[i] != nullptr)
+      {
+        rightMotors[i]->setRequestedSpeed(right);
+      }
+    }
+    for (int i = 0; i < TOTAL_MOTORS; i++)
+    {
+      if (centerMotors[i] != nullptr)
+      {
+        centerMotors[i]->setRequestedSpeed((left + right) / 2);
       }
     }
   }
