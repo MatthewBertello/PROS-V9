@@ -11,6 +11,7 @@
 #include "pros/adi.hpp"
 #include "headers/timer.h"
 #include "headers/pidController.h"
+#include "pros/llemu.hpp"
 
 extern systems *systemsArray[NUMBER_OF_SYSTEMS];
 
