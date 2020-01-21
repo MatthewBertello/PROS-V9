@@ -5,23 +5,23 @@
 
 #include "main.h"
 
-const int FIRSTPORT = 15;
-const int SECONDPORT = 4;
-const int THIRDPORT = 2;
-const int FOURTHPORT = 3;
-const int FIFTHPORT = 5;
-const int SIXTHPORT = 6;
-const int SEVENTHPORT = 7;
-const int EIGTHPORT = 8;
+const int FIRSTPORT = 1;
+const int SECONDPORT = 2;
+const int THIRDPORT = 3;
+const int FOURTHPORT = 4;
+const int FIFTHPORT = 8;
+const int SIXTHPORT = 12;
+const int SEVENTHPORT = 13;
+const int EIGTHPORT = 14;
 
 
 const int FRONTLEFTDRIVE /*FIRSTPORT*/ = 0;
 const int FRONTRIGHTDRIVE /*SECONDPORT*/ = 1;
 const int BACKLEFTDRIVE /*THIRDPORT*/ = 2;
 const int BACKRIGHTDRIVE /*FOURTHPORT*/ = 3;
-const int STRAFEWHEEL /*FIFTHPORT*/ = 4;
-const int INTAKEMOTOR /*SIXTHPORT*/ = 5;
-const int SHOOTER /*SEVENTHPORT*/ = 6;
+const int RAMP /*FIFTHPORT*/ = 4;
+const int LEFTINTAKE /*SIXTHPORT*/ = 5;
+const int RIGHTINTAKE /*SEVENTHPORT*/ = 6;
 const int LIFTMOTOR /*EIGTHPORT*/ = 7;
 
 //driveMotor.h
@@ -46,9 +46,9 @@ const bool DEFAULT_PID_CHANGE_CONSTANT_DIRECTION = true;
 
 //robotDrive.h
 const float ROBOT_DRIVE_DEFAULT_WHEEL_DIAMETER = 2.783;
-const float ROBOT_DRIVE_DEFAULT_WHEEL_DISTANCE_FROM_CENTER = 3.625;
+const float ROBOT_DRIVE_DEFAULT_WHEEL_DISTANCE_FROM_CENTER = 7.8;
 const float ROBOT_DRIVE_DEFAULT_WHEEL_TICKS_PER_ROTATION = 360;
-const float ROBOT_DRIVE_DEFAULT_DISTANCE_THRESHOLD = .5;
+const float ROBOT_DRIVE_DEFAULT_DISTANCE_THRESHOLD = .25;
 const float ROBOT_DRIVE_DEFAULT_ANGLE_THRESHOLD = 50;
 
 //lcdCode.cpp

@@ -3,6 +3,7 @@
 #include "headers/initialize.h"
 #include "headers/lcdCode.h"
 #include "headers/robotDrive.h"
+#include "headers/config.h"
 
 /**
 * Runs the operator control code. This function will be started in its own task
@@ -81,6 +82,35 @@ void doubleControllerDrive()
   }
 
   mainDrive.moveStraightDrive(leftIn, rightIn);
+
+  if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R1) == 1)
+  {
+    driveMotors[LEFTINTAKE].setRequestedSpeed(127);
+    driveMotors[RIGHTINTAKE].setRequestedSpeed(127);
+  }
+  else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R2) == 1)
+  {
+    driveMotors[LEFTINTAKE].setRequestedSpeed(-127);
+    driveMotors[RIGHTINTAKE].setRequestedSpeed(-127);
+  }
+  else
+  {
+    driveMotors[LEFTINTAKE].setRequestedSpeed(0);
+    driveMotors[RIGHTINTAKE].setRequestedSpeed(0);
+  }
+
+  if(master.get_digital(pros::E_CONTROLLER_DIGITAL_L1) == 1)
+  {
+    driveMotors[RAMP].setRequestedSpeed(63);
+  }
+  else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_L2) == 1)
+  {
+    driveMotors[RAMP].setRequestedSpeed(-63);
+  }
+  else
+  {
+    driveMotors[RAMP].setRequestedSpeed(0);
+  }
 }
 
 void singleControllerDrive()

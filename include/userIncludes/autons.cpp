@@ -11,35 +11,76 @@
 
 enum driveCommands
 {
-    waitFor,
-    maxTime,
-    end,
-    waitForTime,
-    driveTo,
-    driveThrough,
-    turnToPoint,
-    turnToAngle
+  waitFor,
+  maxTime,
+  end,
+  waitForTime,
+  driveTo,
+  driveThrough,
+  turnToPoint,
+  turnToAngle
 };
 
 // //autonomous routines
 void autonomous1()
 {
-    autonRobotFunction.addCommands(
-        base, driveTo, 0, 10,
-        base, driveTo, 10, 10,
-        base, driveTo, 10, 0,
-        base, driveTo, 0, 0,
-        base, driveThrough, 0, 10,
-        base, turnToPoint, 0, 0,
-        base, turnToAngle, 0
-    );
-    pros::delay(2000);
-    autonRobotFunction.addCommands(
-        base, turnToAngle, 180
-    );
-    // autonRobotFunction.addCommands(
-    // base, driveTo, 0, 10
-    // );
+  driveMotors[LEFTINTAKE].setRequestedSpeed(-127);
+  driveMotors[RIGHTINTAKE].setRequestedSpeed(-127);
+  // driveMotors[RAMP].setRequestedSpeed(127);
+  pros::delay(1000);
+
+  driveMotors[LEFTINTAKE].setRequestedSpeed(0);
+  driveMotors[RIGHTINTAKE].setRequestedSpeed(0);
+  driveMotors[FRONTLEFTDRIVE].setRequestedSpeed(-127);
+  driveMotors[FRONTRIGHTDRIVE].setRequestedSpeed(-127);
+  driveMotors[BACKLEFTDRIVE].setRequestedSpeed(-127);
+  driveMotors[BACKRIGHTDRIVE].setRequestedSpeed(-127);
+  pros::delay(1000);
+  driveMotors[FRONTLEFTDRIVE].setRequestedSpeed(127);
+  driveMotors[FRONTRIGHTDRIVE].setRequestedSpeed(127);
+  driveMotors[BACKLEFTDRIVE].setRequestedSpeed(127);
+  driveMotors[BACKRIGHTDRIVE].setRequestedSpeed(127);
+  pros::delay(400);
+  driveMotors[FRONTLEFTDRIVE].setRequestedSpeed(0);
+  driveMotors[FRONTRIGHTDRIVE].setRequestedSpeed(0);
+  driveMotors[BACKLEFTDRIVE].setRequestedSpeed(0);
+  driveMotors[BACKRIGHTDRIVE].setRequestedSpeed(0);
+  // driveMotors[RAMP].setRequestedSpeed(-127);
+  // pros::delay(300);
+  // driveMotors[LEFTINTAKE].setRequestedSpeed(127);
+  // driveMotors[RIGHTINTAKE].setRequestedSpeed(127);
+  // autonRobotFunction.addCommands(
+  //   base, driveTo, -10, 0
+  // );
+  // mainDrive.inversed = true;
+  // autonRobotFunction.addCommands(
+  //   base, turnToAngle, 24, 10,
+  //   base, driveTo, 24, 10
+  // );
+  // mainDrive.inversed = false;
+  // autonRobotFunction.addCommands(
+  //   base, turnToAngle, 0,
+  //   base, driveTo, 24, 48,
+  //   base, turnToPoint, 44, 4,
+  //   base, driveTo, 44, 4
+  // );
+  // driveMotors[LEFTINTAKE].setRequestedSpeed(0);
+  // driveMotors[RIGHTINTAKE].setRequestedSpeed(0);
+  //
+  // driveMotors[RAMP].setRequestedSpeed(127);
+  // pros::delay(500);
+  // driveMotors[RAMP].setRequestedSpeed(0);
+  // driveMotors[LEFTINTAKE].setRequestedSpeed(-127);
+  // driveMotors[RIGHTINTAKE].setRequestedSpeed(-127);
+  // pros::delay(250);
+  // driveMotors[LEFTINTAKE].setRequestedSpeed(0);
+  // driveMotors[RIGHTINTAKE].setRequestedSpeed(0);
+  // autonRobotFunction.addCommands(
+  //   base, driveTo, 0, 48
+  // );
+  // autonRobotFunction.addCommands(
+  // base, driveTo, 0, 10
+  // );
 }
 void autonomous2()
 {

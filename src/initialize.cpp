@@ -31,8 +31,8 @@ robotDrive mainDrive;
 
 pros::ADIGyro driveGyro(1);
 
-pros::ADIEncoder leftEncoder(7, 8, false);
-pros::ADIEncoder rightEncoder(5, 6, true);
+pros::ADIEncoder leftEncoder(1, 2, false);
+pros::ADIEncoder rightEncoder(7, 8, true);
 pros::ADIEncoder strafeEncoder(3, 4, true);
 
 robotFunction autonRobotFunction;
@@ -52,7 +52,7 @@ pros::Task mainDrivePositionTrackerTask(mainDrivePositionTrackerFn, (void *)"PRO
 void initialize()
 {
   pros::lcd::initialize();
-  
+
 
   driveMotors[0].set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
   driveMotors[1].set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
@@ -67,14 +67,13 @@ void initialize()
   driveMotors[FRONTRIGHTDRIVE].set_gearing(pros::E_MOTOR_GEARSET_18);
   driveMotors[BACKLEFTDRIVE].set_gearing(pros::E_MOTOR_GEARSET_18);
   driveMotors[BACKRIGHTDRIVE].set_gearing(pros::E_MOTOR_GEARSET_18);
-  driveMotors[INTAKEMOTOR].set_gearing(pros::E_MOTOR_GEARSET_06);
-  driveMotors[SHOOTER].set_gearing(pros::E_MOTOR_GEARSET_36);
-  driveMotors[LIFTMOTOR].set_gearing(pros::E_MOTOR_GEARSET_36);
+  driveMotors[RAMP].set_gearing(pros::E_MOTOR_GEARSET_36);
+  driveMotors[LEFTINTAKE].set_gearing(pros::E_MOTOR_GEARSET_18);
+  driveMotors[RIGHTINTAKE].set_gearing(pros::E_MOTOR_GEARSET_18);
 
   driveMotors[FRONTRIGHTDRIVE].set_reversed(true);
   driveMotors[BACKRIGHTDRIVE].set_reversed(true);
-  driveMotors[SHOOTER].set_reversed(true);
-  driveMotors[INTAKEMOTOR].set_reversed(true);
+  driveMotors[RIGHTINTAKE].set_reversed(true);
 
   mainDrive.addLeftMotor(&driveMotors[FRONTLEFTDRIVE]);
   mainDrive.addLeftMotor(&driveMotors[BACKLEFTDRIVE]);

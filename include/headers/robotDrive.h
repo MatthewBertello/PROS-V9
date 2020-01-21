@@ -36,7 +36,7 @@ public:
     driveTo,
     driveThrough,
     turnToPoint,
-    turnToAngle
+    turnToAngle,
   };
 
   driveLayouts driveType = STRAIGHT_DRIVE;
@@ -77,13 +77,13 @@ public:
   float rightDriveSensorLastReset = 0;
   float strafeDriveSensorLastReset = 0;
 
-  float leftWheelDiameter = ROBOT_DRIVE_DEFAULT_WHEEL_DIAMETER;
-  float rightWheelDiameter = ROBOT_DRIVE_DEFAULT_WHEEL_DIAMETER;
+  float leftWheelDiameter = 3.45;
+  float rightWheelDiameter = 3.45;
   float strafeWheelDiameter = ROBOT_DRIVE_DEFAULT_WHEEL_DIAMETER;
 
   float leftDistanceFromCenter = ROBOT_DRIVE_DEFAULT_WHEEL_DISTANCE_FROM_CENTER;
   float rightDistanceFromCenter = ROBOT_DRIVE_DEFAULT_WHEEL_DISTANCE_FROM_CENTER;
-  float strafeDistanceFromCenter = ROBOT_DRIVE_DEFAULT_WHEEL_DISTANCE_FROM_CENTER;
+  float strafeDistanceFromCenter = 0;
 
   float leftTicksPerRotation = ROBOT_DRIVE_DEFAULT_WHEEL_TICKS_PER_ROTATION;
   float rightTicksPerRotation = ROBOT_DRIVE_DEFAULT_WHEEL_TICKS_PER_ROTATION;
@@ -96,41 +96,43 @@ public:
 
   bool waitingForTimer = false;
 
+  bool inversed = false;
+
   int addSystemCommands(int readPosition, std::vector<int> &commands)
   {
     int numberOfCommands = 0;
     switch (commands[readPosition])
     {
 
-    case waitFor:
+      case waitFor:
       numberOfCommands = 0;
       systemCommands.push_back(commands[readPosition]);
       systemCommands.push_back(commands[readPosition] + 1);
       systemCommands.push_back(systemsArray[commands[readPosition + 1]]->systemCommands.size());
       readPosition += 3;
       break;
-    case maxTime:
+      case maxTime:
       numberOfCommands = 2;
       break;
-    case end:
+      case end:
       numberOfCommands = 2;
       break;
-    case waitForTime:
+      case waitForTime:
       numberOfCommands = 2;
       break;
-    case driveTo:
+      case driveTo:
       numberOfCommands = 3;
       break;
-    case driveThrough:
+      case driveThrough:
       numberOfCommands = 3;
       break;
-    case turnToPoint:
+      case turnToPoint:
       numberOfCommands = 3;
       break;
-    case turnToAngle:
+      case turnToAngle:
       numberOfCommands = 2;
       break;
-    default:
+      default:
       numberOfCommands = 0;
       readPosition++;
       break;
@@ -158,27 +160,27 @@ public:
     {
       switch (systemCommands[systemReadPos])
       {
-      case waitFor:
-      {
-        if ((systemsArray[systemCommands[systemReadPos + 1]]->systemReadPos > systemCommands[systemReadPos] + 2) && systemsArray[systemCommands[systemReadPos + 1]]->systemDone)
+        case waitFor:
         {
-          systemReadPos += 3;
+          if ((systemsArray[systemCommands[systemReadPos + 1]]->systemReadPos > systemCommands[systemReadPos] + 2) && systemsArray[systemCommands[systemReadPos + 1]]->systemDone)
+          {
+            systemReadPos += 3;
+          }
         }
-      }
-      break;
-      case maxTime:
+        break;
+        case maxTime:
         systemMaxTime = systemCommands[systemReadPos + 1];
         systemReadPos += 2;
         break;
-      case end:
+        case end:
         systemDone = true;
         systemMaxTime = 0;
         systemReadPos++;
         break;
-      case waitForTime:
+        case waitForTime:
         if (systemDone)
         {
-          if (systemMaxTime = 0)
+          if (systemMaxTime == 0)
           {
             systemTimer.zeroTimer();
             systemTimer.startTimer();
@@ -190,7 +192,7 @@ public:
           }
         }
         break;
-      default:
+        default:
         if (systemDone)
         {
           systemTimer.zeroTimer();
@@ -213,7 +215,7 @@ public:
 
           switch (systemCommands[systemReadPos])
           {
-          case driveTo:
+            case driveTo:
             driveCommand = driveTo;
             systemReadPos++;
             targetX = systemCommands[systemReadPos];
@@ -222,7 +224,7 @@ public:
             systemReadPos++;
             break;
 
-          case driveThrough:
+            case driveThrough:
             driveCommand = systemCommands[systemReadPos];
             systemReadPos++;
             targetX = systemCommands[systemReadPos];
@@ -231,7 +233,7 @@ public:
             systemReadPos++;
             break;
 
-          case turnToPoint:
+            case turnToPoint:
             driveCommand = systemCommands[systemReadPos];
             systemReadPos++;
             targetX = systemCommands[systemReadPos];
@@ -240,14 +242,14 @@ public:
             systemReadPos++;
             break;
 
-          case turnToAngle:
+            case turnToAngle:
             driveCommand = systemCommands[systemReadPos];
             systemReadPos++;
             targetAngle = systemCommands[systemReadPos];
             systemReadPos++;
             break;
 
-          default:
+            default:
             systemReadPos++;
             break;
           }
@@ -275,7 +277,7 @@ public:
     {
       switch (driveCommand)
       {
-      case driveTo:
+        case driveTo:
 
         deltaX = targetX - currentX;
         deltaY = targetY - currentY;
@@ -290,7 +292,7 @@ public:
         {
           drivePIDTimer.startTimer();
         }
-        if (drivePIDTimer.currentTime() > 300)
+        if (drivePIDTimer.currentTime() > 2000)
         {
           leftSpeed = 0;
           rightSpeed = 0;
@@ -298,7 +300,7 @@ public:
         }
         break;
 
-      case driveThrough:
+        case driveThrough:
 
         deltaX = targetX - currentX;
         deltaY = targetY - currentY;
@@ -315,10 +317,10 @@ public:
           drivePIDTimer.startTimer();
         }
         if (drivePIDTimer.currentTime() > 300)
-          this->systemDone = true;
+        this->systemDone = true;
         break;
 
-      case turnToPoint:
+        case turnToPoint:
         deltaX = targetX - currentX;
         deltaY = targetY - currentY;
         direction = atan(deltaY / deltaX);
@@ -330,11 +332,11 @@ public:
         {
           drivePIDTimer.startTimer();
         }
-        if (drivePIDTimer.currentTime() > 300)
-          this->systemDone = true;
+        if (drivePIDTimer.currentTime() > 2000)
+        this->systemDone = true;
         break;
 
-      case turnToAngle:
+        case turnToAngle:
         direction = targetAngle;
 
         leftSpeed = turnPID.calculatePID(gyroDirection(direction, getCurrentAngle()) * gyroDifference(direction, getCurrentAngle()));
@@ -345,10 +347,10 @@ public:
           drivePIDTimer.startTimer();
         }
         if (drivePIDTimer.currentTime() > 300)
-          this->systemDone = true;
+        this->systemDone = true;
         break;
 
-      default:
+        default:
         leftSpeed = 0;
         rightSpeed = 0;
       }
@@ -386,14 +388,28 @@ public:
   }
   float getCurrentAngle()
   {
-    if ((leftEncoder != nullptr && rightEncoder != nullptr) && !useGyroInsteadOfFreeEncoders)
+    if(!inversed)
+    {
+      if ((leftEncoder != nullptr && rightEncoder != nullptr) && !useGyroInsteadOfFreeEncoders)
       return getAngleAsGyro();
-    else if (driveGyro != nullptr)
+      else if (driveGyro != nullptr)
       return this->driveGyro->get_value();
-    else if (leftMotors[0] != nullptr && rightMotors[0] != nullptr)
+      else if (leftMotors[0] != nullptr && rightMotors[0] != nullptr)
       return getAngleAsGyro();
-    else
+      else
       return 0;
+    }
+    else
+    {
+      if ((leftEncoder != nullptr && rightEncoder != nullptr) && !useGyroInsteadOfFreeEncoders)
+      return correctGyroValue(getAngleAsGyro() - 1800);
+      else if (driveGyro != nullptr)
+      return correctGyroValue(this->driveGyro->get_value() - 1800);
+      else if (leftMotors[0] != nullptr && rightMotors[0] != nullptr)
+      return correctGyroValue(getAngleAsGyro() - 1800);
+      else
+      return 0;
+    }
   }
   bool addLeftMotor(driveMotor *newMotor)
   {
@@ -466,9 +482,9 @@ public:
     else
     {
       if (leftMotors[0] != nullptr)
-        return leftMotors[0]->get_position();
+      return leftMotors[0]->get_position();
       else
-        return 0;
+      return 0;
     }
   }
   float getAbsoluteRightDriveSensor()
@@ -480,9 +496,9 @@ public:
     else
     {
       if (rightMotors[0] != nullptr)
-        return rightMotors[0]->get_position();
+      return rightMotors[0]->get_position();
       else
-        return 0;
+      return 0;
     }
   }
   float getAbsoluteStrafeDriveSensor()
@@ -494,9 +510,9 @@ public:
     else
     {
       if (strafeMotors[0] != nullptr)
-        return strafeMotors[0]->get_position();
+      return strafeMotors[0]->get_position();
       else
-        return 0;
+      return 0;
     }
   }
   float getLeftDriveSensor()
@@ -508,9 +524,9 @@ public:
     else
     {
       if (leftMotors[0] != nullptr)
-        return leftMotors[0]->get_position() - leftDriveSensorLastReset;
+      return leftMotors[0]->get_position() - leftDriveSensorLastReset;
       else
-        return 0;
+      return 0;
     }
   }
   float getRightDriveSensor()
@@ -522,9 +538,9 @@ public:
     else
     {
       if (rightMotors[0] != nullptr)
-        return rightMotors[0]->get_position() - rightDriveSensorLastReset;
+      return rightMotors[0]->get_position() - rightDriveSensorLastReset;
       else
-        return 0;
+      return 0;
     }
   }
   float getStrafeDriveSensor()
@@ -536,24 +552,33 @@ public:
     else
     {
       if (strafeMotors[0] != nullptr)
-        return strafeMotors[0]->get_position() - strafeDriveSensorLastReset;
+      return strafeMotors[0]->get_position() - strafeDriveSensorLastReset;
       else
-        return 0;
+      return 0;
     }
   }
 
   void moveDrive(int left, int right)
   {
+    float tempLeftIn;
+    float tempRightIn;
+    if(inversed)
+    {
+      tempLeftIn = -right;
+      tempRightIn = -left;
+      left = tempLeftIn;
+      right = tempRightIn;
+    }
     switch (driveType)
     {
-    case STRAIGHT_DRIVE:
+      case STRAIGHT_DRIVE:
       moveStraightDrive(left, right);
       break;
-    case TRIANGLE_DRIVE:
+      case TRIANGLE_DRIVE:
       moveTriangleDrive(left, right);
       break;
-    
-    default:
+
+      default:
       break;
     }
   }

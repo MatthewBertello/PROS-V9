@@ -22,9 +22,9 @@ extern const int FRONTLEFTDRIVE;  // port 1
 extern const int FRONTRIGHTDRIVE; // port 2
 extern const int BACKLEFTDRIVE;   // port 3
 extern const int BACKRIGHTDRIVE;  // port 4
-extern const int STRAFEWHEEL;     // port 5
-extern const int INTAKEMOTOR;     // port 6
-extern const int SHOOTER;         // port 7
+extern const int RAMP;     // port 5
+extern const int LEFTINTAKE;     // port 6
+extern const int RIGHTINTAKE;         // port 7
 extern const int LIFTMOTOR;       // port 8
 
 //driveMotor.h

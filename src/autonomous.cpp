@@ -19,7 +19,8 @@
 void autonomous()
 {
   autonRobotFunction.resetRobotFunction();
-
+  autonomousSelected = true;
+  autonomousMode = 1;
   while (!autonomousSelected)
   {
     autonomousSelection();
